@@ -3,7 +3,8 @@
     --bg-color: #222831;
     --primary-color: #20242B;
     --secondary-color: #393E46;
-    --accent-color: #DFD0B8;       
+    --accent-color: #DFD0B8;      
+    --hover-accent-color: #C9BA9A;
 
     /*Icons and text colors*/
     --white-color: #EEEEEE;         
@@ -21,20 +22,109 @@
     --doing-text-color: #7E6553;    
     --done-text-color: #517E67;        
     
-    /*Font weight*/
-    --regular-font: 300;
+    --regular-font: 400;
     --semi-bold-font: 600;
     
-    /*Font size*/
     --font-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.95rem);
     --font-body:  clamp(1rem,    0.95rem + 0.15vw, 1.125rem);
     --font-button: clamp(0.9rem, 0.875rem + 0.1vw, 1rem);
     --font-username: clamp(1.1rem, 1.05rem + 0.2vw, 1.25rem);
     --font-title:    clamp(1.25rem, 1.15rem + 0.3vw, 1.5rem);
+
+    --small-border-radius: 8px;
+    --mid-border-radius: 16px;
+    --large-border-radius:24px;
+
+    --small-gap: 8px;
+    --medium-gap: 16px;
+    --large-gap: 32px;
 }   
 
 body {
     font-family: "Outfit", system-ui, sans-serif;
     color: var(--white-color);
     background: url(/frontend/resources/images/noise_texture.png);
+}
+
+/*-----------------------
+////////HEADER///////////
+------------------------*/
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 64px;
+
+    background: var(--primary-color);
+    box-shadow: 0px 30px 60px -12px rgba(50, 50, 93, 0.25), 0px 18px 36px -18px rgba(0, 0, 0, 0.3);
+}
+
+.logo,
+.pfp{
+    width: 72px;
+
+    /*Filter respect the transparency of the images */
+    filter: drop-shadow(15px 28px 13px rgba(0,0,0,0.01))
+          drop-shadow(8px 16px 11px rgba(0,0,0,0.05))
+          drop-shadow(4px 7px 8px rgba(0,0,0,0.09))
+          drop-shadow(1px 2px 4px rgba(0,0,0,0.1));
+}
+
+.pfp-username{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--medium-gap);
+}
+
+.username{
+    background: var(--green-color);
+    font-weight: var(--regular-font);
+    font-size: var(--font-username);
+    color: var(--secondary-color);
+
+    padding: 8px 16px;
+    border-radius: var(--small-border-radius);
+
+    text-shadow: 0px 10.6303px 3.86555px rgba(0, 0, 0, 0.01), 0px 5.79832px 3.86555px rgba(0, 0, 0, 0.05), 0px 2.89916px 2.89916px rgba(0, 0, 0, 0.09), 0px 0.966387px 0.966387px rgba(0, 0, 0, 0.1);
+}
+
+.balance-log-btns{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--medium-gap);
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--small-gap);
+    padding: 8px 16px;
+    border-radius: var(--large-border-radius);
+
+    background-color: var(--accent-color);
+    color: var(--secondary-color);
+    font-weight: var(--semi-bold-font);
+
+    border: none;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+    
+.button:hover {
+    background-color: var(--hover-accent-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
