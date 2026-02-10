@@ -1,0 +1,40 @@
+:root {
+    /*Background, cards, button and titol colors*/
+    --bg-color: #222831;
+    --primary-color: #20242B;
+    --secondary-color: #393E46;
+    --accent-color: #DFD0B8;       
+
+    /*Icons and text colors*/
+    --white-color: #EEEEEE;         
+    --grey-color: #9D9D9D;        
+    
+    /*Priority and state colors*/
+    --todo-color: #F2E6B1;            
+    --done-color: #95DAB6;          
+    --green-color: #C9DE83;      
+    --orange-color: #EEB68F;           
+    --red-color: #E06565;            
+
+    /*State buttons text colors*/
+    --todo-text-color: #797253;  
+    --doing-text-color: #7E6553;    
+    --done-text-color: #517E67;        
+    
+    /*Font weight*/
+    --regular-font: 300;
+    --semi-bold-font: 600;
+    
+    /*Font size*/
+    --font-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.95rem);
+    --font-body:  clamp(1rem,    0.95rem + 0.15vw, 1.125rem);
+    --font-button: clamp(0.9rem, 0.875rem + 0.1vw, 1rem);
+    --font-username: clamp(1.1rem, 1.05rem + 0.2vw, 1.25rem);
+    --font-title:    clamp(1.25rem, 1.15rem + 0.3vw, 1.5rem);
+}   
+
+body {
+    font-family: "Outfit", system-ui, sans-serif;
+    color: var(--white-color);
+    background: url(/frontend/resources/images/noise_texture.png);
+}
