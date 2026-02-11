@@ -23,13 +23,17 @@
     --done-text-color: #517E67;        
     
     --regular-font: 400;
+    --regular-plus-font: 500;
     --semi-bold-font: 600;
+    --mid-bold-font: 700;
     
-    --font-small: clamp(0.875rem, 0.85rem + 0.1vw, 0.95rem);
-    --font-body:  clamp(1rem,    0.95rem + 0.15vw, 1.125rem);
-    --font-button: clamp(0.9rem, 0.875rem + 0.1vw, 1rem);
-    --font-username: clamp(1.1rem, 1.05rem + 0.2vw, 1.25rem);
-    --font-title:    clamp(1.25rem, 1.15rem + 0.3vw, 1.5rem);
+    --fs-xs: 0.75rem;      /* 12px */
+    --fs-sm: 0.875rem;     /* 14px */
+    --fs-base: 1rem;       /* 16px */
+    --fs-md: 1.125rem;     /* 18px */
+    --fs-lg: 1.25rem;      /* 20px */
+    --fs-xl: 1.5rem;       /* 24px */
+    --fs-2xl: 1.875rem;    /* 30px */
 
     --small-border-radius: 8px;
     --mid-border-radius: 16px;
@@ -47,6 +51,7 @@ body {
     font-family: "Outfit", system-ui, sans-serif;
     color: var(--white-color);
     background: url(/frontend/resources/images/noise_texture.png);
+    user-select: none;
 
 }
 
@@ -95,7 +100,7 @@ header {
 .username{
     background: var(--green-color);
     font-weight: var(--regular-font);
-    font-size: var(--font-username);
+    font-size: var(--fs-base);
     color: var(--secondary-color);
 
     padding: 8px 16px;
@@ -178,10 +183,162 @@ header {
 
 .empty-task{
     width: 340px;
-    height: 197px;
+    height: 205px;
     
     background: var(--secondary-color);
     opacity: 0.4;
     border-radius: var(--mid-border-radius);
 }
+
+.task{
+    display: flex;
+    flex-direction: column;
+    padding: 24px 36px;
+    gap: var(--small-gap);
+
+    max-width: 340px;
+    background: var(--secondary-color);
+    border: 2px solid var(--accent-color);
+    
+    box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.35);
+    border-radius: var(--large-border-radius);
+
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.task.To-Do:hover{
+    border: 2px solid var(--todo-color);
+}
+
+.task.Doing:hover{
+    border: 2px solid var(--orange-color);
+}
+
+.task.Done:hover{
+    border: 2px solid var(--green-color);
+}
+
+
+.task:hover{
+    transform: translateY(-5px);
+    box-shadow: 0px 7px 20px rgba(0, 0, 0, 0.35);
+}
+
+.state-button-frame{
+    display: flex;
+    justify-content: space-between;
+}
+
+.state{
+    font-weight: var(--mid-bold-font);
+    font-size: var(--fs-xs);
+    padding: 4px 16px;
+    box-shadow: 8.61764px 24.8954px 10.5327px rgba(0, 0, 0, 0.01), 4.78758px 14.3627px 8.61764px rgba(0, 0, 0, 0.05), 1.91503px 6.70261px 6.70261px rgba(0, 0, 0, 0.09), 0.957515px 1.91503px 3.83006px rgba(0, 0, 0, 0.1);
+    border-radius: 38.3006px;
+}
+
+
+.state.To-Do{
+    background: var(--todo-color);
+    color: var(--todo-text-color);
+}
+
+.state.Doing{
+    background: var(--orange-color);
+    color: var(--doing-text-color);
+}
+
+.state.Done{
+    background: var(--green-color);
+    color: var(--done-text-color);
+}
+
+
+
+.remove-icon{
+    width: 24px;
+    height: 24px;
+    transition: transform 0.5s ease-in-out; /* animazione fluida */
+}
+
+.remove-icon:hover{
+    transform: rotate(180deg);/* ruota di 180 gradi */
+}
+
+
+.title-desc-frame{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    min-height: 100px;
+}
+
+
+.task-title{
+    font-weight: var(--semi-bold-font);
+    font-size: var(--fs-lg);
+    color: var(--accent-color);
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+
+.task-desc{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+
+    font-weight: 300;
+    font-size: var(--fs-sm);
+
+    color: var(--white-color);
+
+}
+
+.priority-timestamp-frame{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.priority{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 6px;
+    font-weight: var(--regular-font);
+    font-size: var(--fs-xs);
+
+    text-shadow: 0px 6.48743px 2.35907px rgba(0, 0, 0, 0.01), 0px 3.5386px 2.35907px rgba(0, 0, 0, 0.05), 0px 1.7693px 1.7693px rgba(0, 0, 0, 0.09), 0px 0.589766px 0.589766px rgba(0, 0, 0, 0.1);
+
+}
+
+.priority.High{
+    color: var(--red-color);
+}
+
+.priority.Mid{
+    color: var(--orange-color);
+}
+
+.priority.Low{
+    color: var(--green-color);
+}
+
+
+.timestamp{
+    font-weight: var(--regular-plus-font);
+    font-size: var(--fs-xs);
+    color: var(--grey-color);
+}
+
 
