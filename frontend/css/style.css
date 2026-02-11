@@ -38,13 +38,25 @@
     --small-gap: 8px;
     --medium-gap: 16px;
     --large-gap: 32px;
+    --xlarge-gap: 64px;
 }   
 
 body {
+    width: 100vw;
+    height: 100vh;
     font-family: "Outfit", system-ui, sans-serif;
     color: var(--white-color);
     background: url(/frontend/resources/images/noise_texture.png);
+
 }
+
+.content-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra orizzontalmente */
+    gap: var(--xlarge-gap);
+}
+
 
 /*-----------------------
 ////////HEADER///////////
@@ -52,31 +64,31 @@ body {
 
 header {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
+
     align-items: center;
     padding: 16px 64px;
 
+    width: 100%;
+
     background: var(--primary-color);
-    box-shadow: 0px 30px 60px -12px rgba(50, 50, 93, 0.25), 0px 18px 36px -18px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.35);
 }
 
 .logo,
 .pfp{
     width: 72px;
-
     /*Filter respect the transparency of the images */
     filter: drop-shadow(15px 28px 13px rgba(0,0,0,0.01))
           drop-shadow(8px 16px 11px rgba(0,0,0,0.05))
           drop-shadow(4px 7px 8px rgba(0,0,0,0.09))
           drop-shadow(1px 2px 4px rgba(0,0,0,0.1));
+    
 }
 
 .pfp-username{
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: center;
     gap: var(--medium-gap);
 }
 
@@ -94,8 +106,6 @@ header {
 
 .balance-log-btns{
     display: flex;
-    flex-direction: row;
-    align-items: center;
     gap: var(--medium-gap);
 }
 
@@ -128,3 +138,50 @@ header {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
+
+/*-----------------------------------------------
+////////SEARCH BAR AND BUTTONS SECTION///////////
+------------------------------------------------*/
+
+.main-section{
+    /* Auto layout */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 48px 64px;
+    gap: 48px;
+
+    width: 80%;
+
+    border-radius: 48px;
+    
+    background: url(/frontend/resources/images/main_noise.png), #20242B;
+    background-blend-mode: multiply; /* or multiply, screen, etc. */
+
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.35);
+}
+
+.search-and-filter-section{
+    display: flex;
+    align-items: center;
+}
+
+
+.tasks-board{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--large-gap);
+}
+
+.empty-task{
+    width: 340px;
+    height: 197px;
+    
+    background: var(--secondary-color);
+    opacity: 0.4;
+    border-radius: var(--mid-border-radius);
+}
+
