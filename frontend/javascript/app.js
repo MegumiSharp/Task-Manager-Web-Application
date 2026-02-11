@@ -86,18 +86,34 @@ function createTask(title, desc, priority, uid, state, timestamp){
 
     card.addEventListener("click", () =>{
         console.log("hai cliccato la card con riferimento: " + uid)
+        overlay.classList.add("open");
         editTaskDialog.showModal();
     });
 }
 
+const overlay = document.querySelector('.overlay');
 
+
+//Click outside the 
 const modalContent = editTaskDialog.querySelector('.modal-content');
 
 editTaskDialog.addEventListener("click", (event)=>{
     if(event.target !== modalContent){
-        editTaskDialog.close();
+        closeModal();
+        
     }
 });
+
+
+function closeModal(){
+    editTaskDialog.classList.add('closing');
+    setTimeout(()=>{
+        overlay.classList.remove("open");
+        editTaskDialog.close();
+        editTaskDialog.classList.remove('closing');
+        
+    },300);
+}
 
 
 const editModalButton = editTaskDialog.querySelector('#close-modal');
@@ -105,6 +121,6 @@ const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 editModalButton.addEventListener("click", () =>{
     
-    editTaskDialog.close();
+    closeModal();
 });
 
