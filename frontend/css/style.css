@@ -289,6 +289,8 @@ header {
 }
 
 
+
+
 .task-desc{
     overflow: hidden;
     display: -webkit-box;
@@ -407,3 +409,62 @@ header {
     border: 2px solid #DFD0B8;
     border-radius: 43px;
 }
+
+
+
+.edit-modal-title{
+    box-sizing: border-box;
+        font-weight: var(--semi-bold-font);
+    font-size: var(--fs-lg);
+    color: var(--accent-color);
+    
+    white-space: nowrap;
+    overflow: hidden;
+
+    max-width: 300px;
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    resize: none;
+    -webkit-appearance: none;
+    appearance: none;
+
+}
+
+.edit-modal-title:focus{
+    outline: 2px solid black
+
+}
+
+
+.modal-top-frame{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.modal-state{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 8px;
+    
+    background: #222831;
+    border-radius: 20px;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.3s ease-in;
+}
+
+.inactive{
+    opacity: 0.3;
+    transition: opacity 0.3s ease-out;
+    
+}
+
+
+

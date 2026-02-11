@@ -85,9 +85,15 @@ function createTask(title, desc, priority, uid, state, timestamp){
     const card = document.getElementById(uid);
 
     card.addEventListener("click", () =>{
-        console.log("hai cliccato la card con riferimento: " + uid)
         overlay.classList.add("open");
         editTaskDialog.showModal();
+    });
+
+    const deleteTask = card.querySelector(".remove-icon")
+
+    deleteTask.addEventListener("click", (event)=>{
+        event.stopPropagation();
+        deleteTask.parentElement.parentElement.remove();
     });
 }
 
@@ -98,7 +104,8 @@ const overlay = document.querySelector('.overlay');
 const modalContent = editTaskDialog.querySelector('.modal-content');
 
 editTaskDialog.addEventListener("click", (event)=>{
-    if(event.target !== modalContent){
+    //The modal is behind the content, when clicked close the modal
+    if(event.target === editTaskDialog){
         closeModal();
         
     }
@@ -124,3 +131,20 @@ editModalButton.addEventListener("click", () =>{
     closeModal();
 });
 
+
+
+const modalStates =  document.querySelector(".modal-state");
+
+modalStates.addEventListener("click", (e)=>{
+
+    const clickedDiv = e.target;
+    clickedDiv.classList.remove("inactive");
+
+    if(clickedDiv.parentElement === modalStates){
+        otherDivs = Array.from(modalStates.children).filter(div => div !== clickedDiv);
+
+        otherDivs.forEach(element => {
+            element.classList.add("inactive");
+        });
+    }
+});
