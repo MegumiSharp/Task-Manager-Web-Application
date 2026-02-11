@@ -11,6 +11,9 @@ const priority = {
 }
 
 
+const editTaskDialog = document.querySelector("#edit-modal");
+
+
 /*Create placeholder for tasks*/
 function addEmptyTask(taskNum){
     const taskboard = document.querySelector(".tasks-board");
@@ -83,5 +86,25 @@ function createTask(title, desc, priority, uid, state, timestamp){
 
     card.addEventListener("click", () =>{
         console.log("hai cliccato la card con riferimento: " + uid)
+        editTaskDialog.showModal();
     });
 }
+
+
+const modalContent = editTaskDialog.querySelector('.modal-content');
+
+editTaskDialog.addEventListener("click", (event)=>{
+    if(event.target !== modalContent){
+        editTaskDialog.close();
+    }
+});
+
+
+const editModalButton = editTaskDialog.querySelector('#close-modal');
+
+
+editModalButton.addEventListener("click", () =>{
+    
+    editTaskDialog.close();
+});
+

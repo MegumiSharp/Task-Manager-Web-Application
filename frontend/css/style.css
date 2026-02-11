@@ -342,3 +342,32 @@ header {
 }
 
 
+
+#edit-modal::backdrop{
+    background: rgba(15, 4, 4, 0.15);
+    backdrop-filter: blur(10px);
+    
+}
+
+
+#edit-modal[open]{
+    margin: auto;
+    background-color: transparent;
+    border: none;
+}
+
+
+.modal-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+
+    width: 819px;
+    height: 643.17px;
+
+    
+    background: #393E46;
+    border: 2px solid #DFD0B8;
+    border-radius: 43px;
+}

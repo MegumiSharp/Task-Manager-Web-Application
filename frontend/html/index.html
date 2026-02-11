@@ -15,7 +15,6 @@
     <link rel="icon" href="/frontend/resources/icons/appicon.ico">
 </head>
 <body>
-    
     <div class="content-wrapper">
         <header>
             <div><img class="logo" src="/frontend/resources/images/logo.png"></div>
@@ -34,9 +33,16 @@
                 <button class="button"> Add New Task <img src="/frontend/resources/icons/add-new-task.svg"></button>
             </div>
             <div class="tasks-board">
+                
             </div>
         </div>
     </div>
+
+    <dialog id="edit-modal">
+        <div class="modal-content">
+            <button class="button" id="close-modal" aria-label="close modal">Edit</button>
+        </div>
+    </dialog>
 
     <script src="/frontend/javascript/app.js"></script>
 </body>
