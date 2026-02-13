@@ -88,19 +88,20 @@ function createTask(title, desc, priority, uid, state, timestamp){
     
 
     card.addEventListener("click", () =>{
+        cardCorrent = card;
+        
         overlay.classList.add("open");
 
         const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
 
- 
+        const currentCardTitle = cardCorrent.querySelector(".task-title")
+        const curretCardState = cardCorrent.querySelector(".state")
 
+        editState(curretCardState.textContent);
 
-        editState(state);
+        modalTitle.value = currentCardTitle.textContent;
+        modalTitle.textContent = currentCardTitle.textContent;
 
-        cardCorrent = card;
-
-        modalTitle.value = cardCorrent.querySelector(".task-title").textContent;
-        modalTitle.textContent = cardCorrent.querySelector(".task-title").textContent;
         
         editTaskDialog.showModal();
     });
@@ -143,9 +144,14 @@ const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 
 editModalButton.addEventListener("click", () =>{
-    
+   
+
+    const modalState = editTaskDialog.querySelector(".state:not(.inactive)");
     const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
     cardCorrent.querySelector(".task-title").textContent = modalTitle.value;
+    cardCorrent.querySelector(".state").className = modalState.className;
+    cardCorrent.querySelector(".state").textContent =  modalState.textContent;
+    cardCorrent.className = 'task ' +  modalState.textContent;
 
     closeModal();
 });
