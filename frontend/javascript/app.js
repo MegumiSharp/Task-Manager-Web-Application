@@ -10,6 +10,8 @@ const priority = {
     high : "High"
 }
 
+let cardCorrent = null;
+
 
 const editTaskDialog = document.querySelector("#edit-modal");
 
@@ -83,9 +85,23 @@ function createTask(title, desc, priority, uid, state, timestamp){
         </div>`);
 
     const card = document.getElementById(uid);
+    
 
     card.addEventListener("click", () =>{
         overlay.classList.add("open");
+
+        const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
+
+ 
+
+
+        editState(state);
+
+        cardCorrent = card;
+
+        modalTitle.value = cardCorrent.querySelector(".task-title").textContent;
+        modalTitle.textContent = cardCorrent.querySelector(".task-title").textContent;
+        
         editTaskDialog.showModal();
     });
 
@@ -100,14 +116,14 @@ function createTask(title, desc, priority, uid, state, timestamp){
 const overlay = document.querySelector('.overlay');
 
 
+
 //Click outside the 
 const modalContent = editTaskDialog.querySelector('.modal-content');
 
 editTaskDialog.addEventListener("click", (event)=>{
     //The modal is behind the content, when clicked close the modal
     if(event.target === editTaskDialog){
-        closeModal();
-        
+        closeModal();  
     }
 });
 
@@ -128,8 +144,31 @@ const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 editModalButton.addEventListener("click", () =>{
     
+    const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
+    cardCorrent.querySelector(".task-title").textContent = modalTitle.value;
+
     closeModal();
 });
+
+
+
+
+
+function editState(currentState){
+
+    statesDivs = Array.from(modalStates.children);
+
+    statesDivs.forEach(element =>{
+        element.classList.add('inactive');
+        if (element.classList.contains(currentState)){
+            
+            element.classList.remove('inactive');
+        }
+    })
+}
+
+
+
 
 
 
