@@ -28,36 +28,44 @@ function addEmptyTask(taskNum){
     }
 }
 
-//Testing task 
 createTask(
-    "Finire relazione",
-    "Completare la relazione per il corso di matematica, includendo tutti i passaggi teorici e gli esercizi svolti, revisionando le formule principali e assicurandosi che il formato sia coerente con le linee guida del professore.",
-    priority.high,
-    "2432354",
-    states.todo,
-    "14:30 11/02"
-);
-
-createTask(
-    "Fare la spesa",
-    "Comprare latte, pane, uova, frutta e verdura fresche per la settimana, verificare le offerte del supermercato e ricordarsi di prendere anche prodotti per la pulizia della casa e il cibo per il gatto.",
+    "Benvenuto in To-dos! 👋",
+    "Clicca su questa card per modificarla e personalizzarla come preferisci.",
     priority.mid,
-    "24232354",
-    states.doing,
-    "16:00 11/02"
+    crypto.randomUUID(),
+    states.todo,
+    "09:00 13/02"
 );
 
 createTask(
-    "Pulire scrivania",
-    "Riorganizzare completamente la scrivania, eliminando la polvere, sistemando i documenti in cartelle dedicate, pulendo la tastiera e il monitor, e creando uno spazio ordinato e funzionale per lavorare senza distrazioni.",
+    "Elimina le task",
+    "Clicca sulla X in alto per eliminare una task che non ti serve più.",
     priority.low,
-    "2423235435",
-    states.done,
-    "10:15 11/02"
+    crypto.randomUUID(),
+    states.doing,
+    "09:30 13/02"
 );
 
+createTask(
+    "Completa le attività",
+    "Clicca sulla spunta per completare una task.",
+    priority.high,
+    crypto.randomUUID(),
+    states.doing,
+    "10:00 13/02"
+);
 
-addEmptyTask(3);
+createTask(
+    "Ottimo lavoro! 🎉",
+    "Questa è una task completata. Continua così!",
+    priority.low,
+    crypto.randomUUID(),
+    states.done,
+    "08:30 13/02"
+);
+
+const addTaskModalButton = editTaskDialog.querySelector("#add-task-modal")
+//addEmptyTask(3);
 
 function createTask(title, desc, priority, uid, state, timestamp){
     const taskBoard = document.querySelector(".tasks-board");
@@ -116,6 +124,8 @@ function createTask(title, desc, priority, uid, state, timestamp){
         modalDesc.value = currentCardDesc.textContent;
 
         
+        addTaskModalButton.setAttribute("style", "display: none");
+        editModalButton.setAttribute("style", "display: block");
         editTaskDialog.showModal();
     });
 
@@ -192,7 +202,7 @@ editModalButton.addEventListener("click", () =>{
     cardCorrent.querySelector(".state").className = modalState.className;
     cardCorrent.querySelector(".state").textContent =  modalState.textContent;
     cardCorrent.className = 'task ' +  modalState.textContent;
-
+    
     closeModal();
 });
 
@@ -245,3 +255,64 @@ function toggleInactive(selector){
 const closeModalBtn = editTaskDialog.querySelector(".close-window");
 
 closeModalBtn.addEventListener("click", ()=>{closeModal();});
+
+
+const addNewTaskBtn = document.querySelector('.add-new-task');
+
+addNewTaskBtn.addEventListener("click", ()=> {
+
+        overlay.classList.add("open");
+
+        const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
+        const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
+
+        setActiveOption(modalStates, "To-Do");
+        setActiveOption(modalPriority, "Low");
+
+        modalTitle.value = "Title Task"
+
+        modalDesc.value = "Describe your task here.."
+
+
+
+        addTaskModalButton.setAttribute("style", "display: block");
+        editModalButton.setAttribute("style", "display: none");
+        editTaskDialog.showModal();
+});
+
+
+addTaskModalButton.addEventListener("click",()=>{
+
+    
+    const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title").value;
+    const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description").value;
+    const uuid  = crypto.randomUUID();
+
+    const modalPrio = editTaskDialog.querySelector(".modpriority:not(.inactive)");
+    const modalState = editTaskDialog.querySelector(".state:not(.inactive)").textContent;
+
+    const modalPrioText = modalPrio.textContent.replace("Priority", "");
+        
+    const date = new Date(Date.now());
+    const hh = String(date.getHours()).padStart(2,'0');
+    const min = String(date.getMinutes()).padStart(2,'0');;
+    const dd = String(date.getDate()).padStart(2,'0');
+    const mm = String(date.getMonth() + 1).padStart(2,'0');
+    const now = `${hh}:${min} ${dd}/${mm}`
+
+    console.log(mm)
+
+    console.log(modalState);
+    createTask(
+        modalTitle,
+        modalDesc,
+        modalPrioText,
+        uuid,
+        modalState,
+        now,
+    );
+    
+    closeModal();
+});
+
+
