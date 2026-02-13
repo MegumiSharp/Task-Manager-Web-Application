@@ -240,3 +240,8 @@ function toggleInactive(selector){
         }
     });
 }
+
+
+const closeModalBtn = editTaskDialog.querySelector(".close-window");
+
+closeModalBtn.addEventListener("click", ()=>{closeModal();});
