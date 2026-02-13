@@ -78,7 +78,7 @@ function createTask(title, desc, priority, uid, state, timestamp){
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="7.66696" cy="7.66696" r="7.66696" fill="currentColor"/>
                     </svg>
-                    ${priority}
+                    <div>${priority}</div>
                 </div>
                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
                     <title>Done</title>
@@ -105,7 +105,10 @@ function createTask(title, desc, priority, uid, state, timestamp){
         const currentCardTitle = cardCorrent.querySelector(".task-title");
         const curretCardState = cardCorrent.querySelector(".state");
 
-        editState(curretCardState.textContent);
+        const currentCardPriority = cardCorrent.querySelector(".priority");
+
+        setActiveOption(modalStates, curretCardState.textContent);
+        setActiveOption(modalPriority, currentCardPriority.textContent.trim())
 
         modalTitle.value = currentCardTitle.textContent;
         modalTitle.textContent = currentCardTitle.textContent;
@@ -130,7 +133,6 @@ function createTask(title, desc, priority, uid, state, timestamp){
 
         const curretCardState = card.querySelector(".state")
         e.stopPropagation();
-        console.log(curretCardState)
         curretCardState.className = "state Done";
         curretCardState.textContent = "Done";
         card.className = 'task Done';
@@ -171,11 +173,19 @@ const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 editModalButton.addEventListener("click", () =>{
     const currentCardDesc = cardCorrent.querySelector(".task-desc");
+    const currentCardPriority = cardCorrent.querySelector(".priority")
 
     const modalState = editTaskDialog.querySelector(".state:not(.inactive)");
     const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
     const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
     
+    const modalPrio = editTaskDialog.querySelector(".modpriority:not(.inactive)");
+
+    const modalPrioText = modalPrio.textContent.replace("Priority", "");
+
+    //When edit button cliccked, the priority text in the card changes based on the priority toggle
+    currentCardPriority.className = "priority " + modalPrioText;
+    currentCardPriority.querySelector("div").textContent  = modalPrioText;
 
     currentCardDesc.textContent = modalDesc.value;
     cardCorrent.querySelector(".task-title").textContent = modalTitle.value;
@@ -188,15 +198,14 @@ editModalButton.addEventListener("click", () =>{
 
 
 
+function setActiveOption(container, optionClass){
 
+    let childrens = Array.from(container.children);
 
-function editState(currentState){
-
-    statesDivs = Array.from(modalStates.children);
-
-    statesDivs.forEach(element =>{
+    childrens.forEach(element =>{
         element.classList.add('inactive');
-        if (element.classList.contains(currentState)){
+         
+        if (element.classList.contains(optionClass)){
             
             element.classList.remove('inactive');
         }
@@ -205,20 +214,29 @@ function editState(currentState){
 
 
 
-
-
+const modalPriority =  document.querySelector(".modal-priority");
 const modalStates =  document.querySelector(".modal-state");
 
-modalStates.addEventListener("click", (e)=>{
+toggleInactive(modalPriority);
+toggleInactive(modalStates);
 
-    const clickedDiv = e.target;
-    clickedDiv.classList.remove("inactive");
+/**
+ * Toggles 'inactive' class on container children.
+ * When an element is clicked, removes 'inactive' from it
+ * and adds it to all other siblings.
+ */
+function toggleInactive(selector){
+    selector.addEventListener("click", (e)=>{
 
-    if(clickedDiv.parentElement === modalStates){
-        otherDivs = Array.from(modalStates.children).filter(div => div !== clickedDiv);
+        const clickedDiv = e.target;
+        clickedDiv.classList.remove("inactive");
 
-        otherDivs.forEach(element => {
-            element.classList.add("inactive");
-        });
-    }
-});
+        if(clickedDiv.parentElement === selector){
+            let otherDivs = Array.from(selector.children).filter(div => div !== clickedDiv);
+
+            otherDivs.forEach(element => {
+                element.classList.add("inactive");
+            });
+        }
+    });
+}
