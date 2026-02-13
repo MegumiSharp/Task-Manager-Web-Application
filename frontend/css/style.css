@@ -183,7 +183,7 @@ header {
 
 .empty-task{
     width: 340px;
-    height: 205px;
+    height: 242px;
     
     background: var(--secondary-color);
     opacity: 0.4;
@@ -218,6 +218,19 @@ header {
 .task.Done:hover{
     border: 2px solid var(--green-color);
 }
+
+.task.Done{
+    opacity: 0.5;
+    filter: saturate(0.5);
+    
+}
+
+.task.Done .task-title {
+    text-decoration: line-through;
+    transition: opacity 0.3s ease;
+}
+
+
 
 
 .task:hover{
