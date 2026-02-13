@@ -410,6 +410,8 @@ header {
     border: 2px solid #DFD0B8;
     border-radius: 43px;
     gap: 16px;
+    
+    width: 50vw; 
 }
 
 
