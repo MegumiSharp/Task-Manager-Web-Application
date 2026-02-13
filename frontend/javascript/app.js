@@ -80,6 +80,12 @@ function createTask(title, desc, priority, uid, state, timestamp){
                     </svg>
                     ${priority}
                 </div>
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+                    <title>Done</title>
+                    <g>
+                        <path fill="currentColor" d="M43.707,9.878c-.391-.391-1.024-.391-1.414,0l-25.293,25.293L5.707,23.878c-.391-.391-1.024-.391-1.414,0l-1.414,1.414c-.391,.391-.391,1.024,0,1.414l13.414,13.414c.391,.391,1.024,.391,1.414,0L45.122,12.707c.391-.391,.391-1.024,0-1.414l-1.414-1.414Z"></path>
+                    </g>
+                </svg>
                 <p class="timestamp">${timestamp}</p>
             </div>
         </div>`);
@@ -112,6 +118,22 @@ function createTask(title, desc, priority, uid, state, timestamp){
         event.stopPropagation();
         deleteTask.parentElement.parentElement.remove();
     });
+
+
+    const checkMark = card.querySelector(".checkmark");
+
+    checkMark.addEventListener("click", (e)=>{
+
+        const curretCardState = card.querySelector(".state")
+        e.stopPropagation();
+        console.log(curretCardState)
+        curretCardState.className = "state Done";
+        curretCardState.textContent = "Done";
+        card.className = 'task Done';
+
+    })
+
+
 }
 
 const overlay = document.querySelector('.overlay');
@@ -172,7 +194,6 @@ function editState(currentState){
         }
     })
 }
-
 
 
 

@@ -236,6 +236,7 @@ header {
     padding: 4px 16px;
     box-shadow: 8.61764px 24.8954px 10.5327px rgba(0, 0, 0, 0.01), 4.78758px 14.3627px 8.61764px rgba(0, 0, 0, 0.05), 1.91503px 6.70261px 6.70261px rgba(0, 0, 0, 0.09), 0.957515px 1.91503px 3.83006px rgba(0, 0, 0, 0.1);
     border-radius: 38.3006px;
+    transition: all 0.7s ease;
 }
 
 
@@ -530,3 +531,20 @@ color: var(--white-color);
     justify-content: space-between;
     width: 100%;
 }
+
+
+.checkmark{
+    width: 24px;
+    color: var(--white-color);
+    transition: all 0.5s ease;
+    
+}
+
+.checkmark:hover{
+    color: var(--green-color);
+
+
+    transform: scale(1.2);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+}
+
