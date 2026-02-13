@@ -98,15 +98,19 @@ function createTask(title, desc, priority, uid, state, timestamp){
         
         overlay.classList.add("open");
 
-        const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
+        const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
+        const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
 
-        const currentCardTitle = cardCorrent.querySelector(".task-title")
-        const curretCardState = cardCorrent.querySelector(".state")
+        const currentCardDesc = cardCorrent.querySelector(".task-desc");
+        const currentCardTitle = cardCorrent.querySelector(".task-title");
+        const curretCardState = cardCorrent.querySelector(".state");
 
         editState(curretCardState.textContent);
 
         modalTitle.value = currentCardTitle.textContent;
         modalTitle.textContent = currentCardTitle.textContent;
+
+        modalDesc.value = currentCardDesc.textContent;
 
         
         editTaskDialog.showModal();
@@ -166,10 +170,14 @@ const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 
 editModalButton.addEventListener("click", () =>{
-   
+    const currentCardDesc = cardCorrent.querySelector(".task-desc");
 
     const modalState = editTaskDialog.querySelector(".state:not(.inactive)");
-    const modalTitle = editTaskDialog.querySelector(".edit-modal-title");
+    const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
+    const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
+    
+
+    currentCardDesc.textContent = modalDesc.value;
     cardCorrent.querySelector(".task-title").textContent = modalTitle.value;
     cardCorrent.querySelector(".state").className = modalState.className;
     cardCorrent.querySelector(".state").textContent =  modalState.textContent;

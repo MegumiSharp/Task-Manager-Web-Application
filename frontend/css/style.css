@@ -196,7 +196,7 @@ header {
     padding: 24px 36px;
     gap: var(--small-gap);
 
-    max-width: 340px;
+    width: 340px;
     background: var(--secondary-color);
     border: 2px solid var(--accent-color);
     
@@ -422,21 +422,13 @@ header {
     background: #393E46;
     border: 2px solid #DFD0B8;
     border-radius: 43px;
-    gap: 16px;
+    gap: 24px;
     
     width: 50vw; 
 }
 
 
-
-.edit-modal-title{
-
-        font-weight: var(--semi-bold-font);
-    font-size: var(--fs-lg);
-    color: var(--accent-color);
-    
-    white-space: nowrap;
-    
+.edit-modal-text-area{
     background: transparent;
     outline: none;
     box-shadow: none;
@@ -451,18 +443,34 @@ header {
 
     line-height: 1;
 
-        opacity: 1;
+    opacity: 1;
     transition: opacity 0.5s ease-in;
-    
-
+    word-wrap: break-word;
 }
 
 
-.edit-modal-title:focus{
+.edit-modal-text-area.title{
+    font-weight: var(--semi-bold-font);
+    font-size: var(--fs-lg);
+    color: var(--accent-color);
+}
+
+.edit-modal-text-area.description{
+    font-weight: 300;
+    font-size: var(--fs-md);
+    color: var(--white-color);
+}
+
+
+
+.edit-modal-text-area:focus{
 
     outline: 2px solid #DFD0B8;
     border-radius: 8px;
-    
+}
+
+
+.edit-modal-text-area.title:focus{
     opacity: 0.4;
     transition: opacity 0.5s ease-out;
 }
@@ -482,23 +490,20 @@ header {
 .label-edit-title{
     /* Frame 16 */
 
-/* Auto layout */
-display: flex;
-align-items: center;
-gap: 8px;
+ 
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-
-/* edit 1 */
-
-width: 19.6px;
-height: 19.6px;
+    width: 19.6px;
+    height: 19.6px;
 
 
 
-font-weight: 400;
-font-size: 20px;
+    font-weight: var(--semi-bold-font);
+    font-size: 20px;
 
-color: var(--white-color);
+    color: var(--white-color);
 
 
 
