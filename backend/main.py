@@ -126,3 +126,25 @@ def delete_task(task_id: str):
     print(f"✅ Task {task_id} eliminato")
 
     return {"message": "Task eliminato con successo"}
+
+
+@app.get("/tasks")
+def get_tasks():
+        conn = get_db_connection()
+        cursor = conn.execute("SELECT * FROM tasks ORDER BY datetime DESC")
+
+        tasks = []
+       
+        for record in cursor.fetchall():
+            tasks.append({
+                "title": record["title"],
+                "description": record["description"],
+                "urgency": record["urgency"],
+                "uid": record["task_id"],
+                "state": record["state"],
+                "datetime": record["datetime"]
+            })
+
+        conn.close()
+        return tasks
+

@@ -10,10 +10,23 @@ const priority = {
     high : "High"
 }
 
+
+
+
 let cardCorrent = null;
 
 const API_URL = 'http://127.0.0.1:8000';
 let taskArray = [];
+
+loadAndDisplayTask();
+async function loadAndDisplayTask(){
+    taskArray = await getAllTask();
+
+    taskArray.forEach(element => {
+        createTask(element.title, element.description, element.priority, element.uid, element.state, element.timestamp)
+    })
+}
+
 
 
 const editTaskDialog = document.querySelector("#edit-modal");
@@ -31,50 +44,12 @@ function addEmptyTask(taskNum){
     }
 }
 
-createTask(
-    "Benvenuto in To-dos! 👋",
-    "Clicca su questa card per modificarla e personalizzarla come preferisci.",
-    priority.mid,
-    crypto.randomUUID(),
-    states.todo,
-    "09:00 13/02"
-);
-
-
-
-createTask(
-    "Elimina le task",
-    "Clicca sulla X in alto per eliminare una task che non ti serve più.",
-    priority.low,
-    crypto.randomUUID(),
-    states.doing,
-    "09:30 13/02"
-);
-
-createTask(
-    "Completa le attività",
-    "Clicca sulla spunta per completare una task.",
-    priority.high,
-    crypto.randomUUID(),
-    states.doing,
-    "10:00 13/02"
-);
-
-createTask(
-    "Ottimo lavoro! 🎉",
-    "Questa è una task completata. Continua così!",
-    priority.low,
-    crypto.randomUUID(),
-    states.done,
-    "08:30 13/02"
-);
 
 const addTaskModalButton = editTaskDialog.querySelector("#add-task-modal")
 //addEmptyTask(3);
 
 function createTask(title, desc, priority, uid, state, timestamp){
     const taskBoard = document.querySelector(".tasks-board");
-
 
     taskBoard.insertAdjacentHTML("beforeend",`
          <div class="task ${state}" id="${uid}">
@@ -104,7 +79,6 @@ function createTask(title, desc, priority, uid, state, timestamp){
         </div>`);
 
     const card = document.getElementById(uid);
-    
 
     card.addEventListener("click", () =>{
         cardCorrent = card;
@@ -380,3 +354,15 @@ async function deleteTaskFromDb(task_id){
         return null;
     }
 }
+
+
+async function getAllTask(){
+    try {
+            const response = await fetch(`${API_URL}/tasks`);
+            if (!response.ok) throw new Error('Errore nel recupero dei task');
+            return await response.json();
+        } catch (error) {
+            console.error('Errore:', error);
+            return [];
+        }
+    }
