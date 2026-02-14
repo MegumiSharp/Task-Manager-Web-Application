@@ -12,6 +12,8 @@ const priority = {
 
 let cardCorrent = null;
 
+let taskArray = [];
+
 
 const editTaskDialog = document.querySelector("#edit-modal");
 
@@ -148,7 +150,6 @@ function createTask(title, desc, priority, uid, state, timestamp){
         card.className = 'task Done';
 
     })
-
 
 }
 
@@ -300,9 +301,6 @@ addTaskModalButton.addEventListener("click",()=>{
     const mm = String(date.getMonth() + 1).padStart(2,'0');
     const now = `${hh}:${min} ${dd}/${mm}`
 
-    console.log(mm)
-
-    console.log(modalState);
     createTask(
         modalTitle,
         modalDesc,
@@ -312,7 +310,22 @@ addTaskModalButton.addEventListener("click",()=>{
         now,
     );
     
+    addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
+
     closeModal();
+    console.log(taskArray)
 });
 
 
+function addTaskToArray(title, desc, priority, uid, state, timestamp){
+    let task = {
+        title: title,
+        description: desc,
+        urgency: priority,
+        id: uid,
+        state: state,
+        datetime: timestamp
+    };
+    
+    taskArray.push(task);
+}

@@ -421,7 +421,7 @@ header {
     padding: 32px;
 
     width: 819px;
-    height: 643.17px;
+
 
     background: #393E46;
     border: 2px solid #DFD0B8;
@@ -536,7 +536,7 @@ header {
     gap: 8px;
     
     background: #222831;
-    border-radius: 20px;
+    border-radius: 50px;
     cursor: pointer;
     opacity: 1;
     transition: opacity 0.3s ease-in;
@@ -618,6 +618,7 @@ header {
 }
 
 .close-window{
+    width: 24px;
     cursor: pointer;
     opacity: 0.7;
     transition: all 0.5s ease-in-out

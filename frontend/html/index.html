@@ -41,19 +41,20 @@
         <div class="modal-content">
             <div class="modal-top-frame">
                 <div class="modal-priority-state-frame">
-                    <div class="modal-priority">
-                        <div class="modpriority Low inactive">Priority Low</div>
-                        <div class="modpriority Mid inactive">Priority Mid</div>
-                        <div class="modpriority High">Priority High</div>
-                    </div>
                     <div class="modal-state">
                         <div class="state To-Do inactive" style="font-size: 16px;">To-Do</div>
                         <div class="state Doing inactive"style="font-size: 16px;">Doing</div>
                         <div class="state Done"style="font-size: 16px;">Done</div>
                     </div>
-                    <img  class="close-window" title="Close Window" alter="close button" src="/frontend/resources/icons/close-modal.svg">
+                    <div class="modal-priority">
+                        <div class="modpriority Low inactive">Priority Low</div>
+                        <div class="modpriority Mid inactive">Priority Mid</div>
+                        <div class="modpriority High">Priority High</div>
+                    </div>
+
+                    <img  class="close-window" title="Close Window" alter="close button" src="/frontend/resources/icons/remove.svg">
                 </div>
-                <hr style="border: 1.5px solid #DFD0B8; width: 100%; border-radius: 20px;">
+                <hr style="border: 1.5px solid #DFD0B8; width: 120%; border-radius: 20px;">
                 </svg>
             </div>
             <div class="label-title-frame">
@@ -73,7 +74,7 @@
             </div>
 
 
-            <button class="button" id="close-modal" aria-label="close modal">Edit</button>
+            <button class="button" id="close-modal" aria-label="close modal">Apply Changes</button>
             <button class="button" id="add-task-modal" aria-label="close modal">Add Task</button>
         </div>
     </dialog>
