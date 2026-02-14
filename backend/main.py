@@ -1,0 +1,109 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  #Makes the browser accept the request from the frontend
+from pydantic import BaseModel                      #Create a templete for data to improve verbose error handling
+from typing import List, Optional
+from contextlib import asynccontextmanager
+import sqlite3
+import json
+
+DATABASE_NAME = "tasks.db"
+
+FRONTEND_ORIGIN = "http://localhost:5500"
+
+# Create the databse vefore the server start to accept request
+@asynccontextmanager
+async def server_lifespan(app: FastAPI):
+        print("Server FasAPI in avvio...")
+        create_db()
+        print("✅ Server Pronto")
+        yield
+        #Aggiungere qui il salvataggio nel database
+        print("Server in chiusura")
+
+
+app = FastAPI(lifespan=server_lifespan)
+
+
+
+# ═══════════════════════════════════════════════════════════
+# CONFIGURAZIONE CORS 
+# ═══════════════════════════════════════════════════════════
+
+# Makes the browser front end to not to block the request
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_ORIGIN],           #Alows request from this website
+    allow_credentials = True,               #To send cookies and autentication
+    allow_methods =["*"],                   #What methods http are ok (get,post, put,delete, patch, ecc)
+    allow_headers= ["*"]                    #What header can send request? content type autorization?
+)
+
+# ═══════════════════════════════════════════════════════════
+# Data Model
+# ═══════════════════════════════════════════════════════════
+
+# What types of data are our task 
+
+class Task(BaseModel):
+        id: Optional[str] = None
+        title: str
+        description: str
+        urgency: str
+        state: str
+        datetime: str
+
+
+# ═══════════════════════════════════════════════════════════
+# Database Functions
+# ═══════════════════════════════════════════════════════════
+
+def get_db_connection():
+        #Create connection with databse, if not possible it create one
+        connection = sqlite3.connect(DATABASE_NAME)
+        connection.row_factory = sqlite3.Row # Return result as dictionary
+        return connection
+        
+def create_db():
+        connection = sqlite3.connect(DATABASE_NAME)
+        connection.execute('''
+        CREATE TABLE IF NOT EXISTS tasks(
+                task_id TEXT PRIMARY KEY, 
+                title TEXT NOT NULL,
+                description TEXT,
+                urgency TEXT NOT NULL,
+                state TEXT NOT NULL,
+                datetime TEXT NOT NULL)
+        ''')
+        connection.commit()
+        connection.close()
+        print("✅ Database inizializzato!")
+        
+
+@app.get("/")
+def root():
+        return{
+            "message": "Task Manager API",
+            "status": "running",
+            "endpoints": {
+                "GET /tasks": "Ottieni tutti i task",
+                "POST /tasks": "Crea un nuovo task",
+                "POST /tasks/bulk": "Crea multipli task da array",
+                "PUT /tasks/{id}": "Aggiorna un task",
+                "DELETE /tasks/{id}": "Elimina un task"    
+        }}
+
+
+# Crea un singolo task nel databse
+@app.post("/tasks")
+def create_task(task: Task):
+    print(f"Richiesta POST /tasks ricevuta: {task.title}")
+    
+    conn = get_db_connection()
+    cursor = conn.execute(
+        "INSERT INTO tasks (task_id, title, description, urgency, state, datetime) VALUES (?,?,?,?,?,?)",
+        (task.id, task.title, task.description, task.urgency, task.state, task.datetime)
+    )
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ Task creato con ID: {task.id}")

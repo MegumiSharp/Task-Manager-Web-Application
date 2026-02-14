@@ -311,9 +311,10 @@ addTaskModalButton.addEventListener("click",()=>{
     );
     
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
+    
+
 
     closeModal();
-    console.log(taskArray)
 });
 
 
@@ -329,3 +330,26 @@ function addTaskToArray(title, desc, priority, uid, state, timestamp){
     
     taskArray.push(task);
 }
+
+
+const API_URL = 'http://127.0.0.1:8000';
+
+//Fetch isa a function used fro making htttp requests to fetch resources
+function saveAllTask(){
+
+    fetch(`${API_URL}/tasks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskArray[0])
+    })
+
+    console.log(JSON.stringify(taskArray[0]))
+}
+
+
+const tempBtn = document.querySelector(".audit")
+tempBtn.addEventListener("click",()=>{
+    saveAllTask();
+})
