@@ -23,7 +23,7 @@ async function loadAndDisplayTask(){
     taskArray = await getAllTask();
 
     taskArray.forEach(element => {
-        createTask(element.title, element.description, element.priority, element.uid, element.state, element.timestamp)
+        createTask(element.title, element.description, element.urgency, element.uid, element.state, element.datetime)
     })
 }
 
