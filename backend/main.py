@@ -148,3 +148,22 @@ def get_tasks():
         conn.close()
         return tasks
 
+
+@app.put("/tasks/{task_id}")
+def edit_task(task_id: str, task: Task):
+    print(f"✅ Richiesta EDIT /tasks ricevuta: {task.title}")
+    
+    conn = get_db_connection()
+    cursor = conn.execute(
+        "UPDATE tasks SET title  = ?, description = ?, urgency = ?, state = ? WHERE task_id = ?", 
+        (task.title, task.description, task.urgency, task.state, task_id))
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+          conn.close()
+          raise HTTPException(status_code=404, detail="Task non trovato")
+    
+    conn.close()
+    
+    print(f"✅ Task {task_id} modificato")
+    return {"message": "Task modificato con successo"}

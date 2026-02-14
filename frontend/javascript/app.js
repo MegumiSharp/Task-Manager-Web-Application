@@ -13,7 +13,7 @@ const priority = {
 
 
 
-let cardCorrent = null;
+let currentCard = null;
 
 const API_URL = 'http://127.0.0.1:8000';
 let taskArray = [];
@@ -81,18 +81,18 @@ function createTask(title, desc, priority, uid, state, timestamp){
     const card = document.getElementById(uid);
 
     card.addEventListener("click", () =>{
-        cardCorrent = card;
+        currentCard = card;
         
         overlay.classList.add("open");
 
         const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
         const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
 
-        const currentCardDesc = cardCorrent.querySelector(".task-desc");
-        const currentCardTitle = cardCorrent.querySelector(".task-title");
-        const curretCardState = cardCorrent.querySelector(".state");
+        const currentCardDesc = currentCard.querySelector(".task-desc");
+        const currentCardTitle = currentCard.querySelector(".task-title");
+        const curretCardState = currentCard.querySelector(".state");
 
-        const currentCardPriority = cardCorrent.querySelector(".priority");
+        const currentCardPriority = currentCard.querySelector(".priority");
 
         setActiveOption(modalStates, curretCardState.textContent);
         setActiveOption(modalPriority, currentCardPriority.textContent.trim())
@@ -160,31 +160,53 @@ function closeModal(){
 const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 
-editModalButton.addEventListener("click", () =>{
-    const currentCardDesc = cardCorrent.querySelector(".task-desc");
-    const currentCardPriority = cardCorrent.querySelector(".priority")
-
+editModalButton.addEventListener("click", () => {
+    // Ottieni valori dal modal
+    const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title").value;
+    const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description").value;
     const modalState = editTaskDialog.querySelector(".state:not(.inactive)");
-    const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
-    const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description");
-    
     const modalPrio = editTaskDialog.querySelector(".modpriority:not(.inactive)");
+    const modalPrioText = modalPrio.textContent.replace("Priority", "").trim();
+    const modalStateText = modalState.textContent;
 
-    const modalPrioText = modalPrio.textContent.replace("Priority", "");
-
-    //When edit button cliccked, the priority text in the card changes based on the priority toggle
-    currentCardPriority.className = "priority " + modalPrioText;
-    currentCardPriority.querySelector("div").textContent  = modalPrioText;
-
-    currentCardDesc.textContent = modalDesc.value;
-    cardCorrent.querySelector(".task-title").textContent = modalTitle.value;
-    cardCorrent.querySelector(".state").className = modalState.className;
-    cardCorrent.querySelector(".state").textContent =  modalState.textContent;
-    cardCorrent.className = 'task ' +  modalState.textContent;
+    // Aggiorna DOM della card
+    updateCardDOM(currentCard, {
+        title: modalTitle,
+        description: modalDesc,
+        priority: modalPrioText,
+        state: modalStateText
+    });
     
+    // Aggiorna task nell'array e salva
+    const taskId = currentCard.id;
+    const index = taskArray.findIndex(t => t.uid === taskId);
+    console.log(taskArray[index])
+    taskArray[index].title = modalTitle;
+    taskArray[index].description = modalDesc;
+    taskArray[index].urgency = modalPrioText;
+    taskArray[index].state = modalStateText;
+        
+    editTask(taskId, taskArray[index]);
+    
+
     closeModal();
 });
 
+// Funzione helper per aggiornare DOM
+function updateCardDOM(card, data) {
+    card.querySelector(".task-title").textContent = data.title;
+    card.querySelector(".task-desc").textContent = data.description;
+    
+    const stateElement = card.querySelector(".state");
+    stateElement.className = `state ${data.state}`;
+    stateElement.textContent = data.state;
+    
+    const priorityElement = card.querySelector(".priority");
+    priorityElement.className = `priority ${data.priority}`;
+    priorityElement.querySelector("div").textContent = data.priority;
+    
+    card.className = `task ${data.state}`;
+}
 
 
 function setActiveOption(container, optionClass){
@@ -365,4 +387,24 @@ async function getAllTask(){
             console.error('Errore:', error);
             return [];
         }
+}
+
+async function editTask(task_id, task){
+    try{
+        const response = await fetch(`${API_URL}/tasks/${task_id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! Status ${response.status}`);
+        
+        const data = await response.json();
+        console.log('✅ Task aggiornato:', data.message);
+        return data;
+    } catch(error) {
+        console.error('Errore nell\'aggiornamento del task:', error);
+        alert('Errore nell\'aggiornare il task. Riprova più tardi.');
+        return null;
     }
+}
