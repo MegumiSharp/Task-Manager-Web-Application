@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware  #Makes the browser accept the request from the frontend
 from pydantic import BaseModel                      #Create a templete for data to improve verbose error handling
 from typing import List, Optional
@@ -20,10 +20,7 @@ async def server_lifespan(app: FastAPI):
         #Aggiungere qui il salvataggio nel database
         print("Server in chiusura")
 
-
 app = FastAPI(lifespan=server_lifespan)
-
-
 
 # ═══════════════════════════════════════════════════════════
 # CONFIGURAZIONE CORS 
@@ -85,21 +82,20 @@ def root():
             "message": "Task Manager API",
             "status": "running",
             "endpoints": {
-                "GET /tasks": "Ottieni tutti i task",
-                "POST /tasks": "Crea un nuovo task",
-                "POST /tasks/bulk": "Crea multipli task da array",
-                "PUT /tasks/{id}": "Aggiorna un task",
-                "DELETE /tasks/{id}": "Elimina un task"    
+                "GET /tasks": "Get All tasks",
+                "POST /tasks": "Create Task in Database",
+                "PUT /tasks/{id}": "Update task in Database",
+                "DELETE /tasks/{id}": "Delete task in Database"    
         }}
 
 
-# Crea un singolo task nel databse
+# When arrive an http request with route /tasks and post, opens the db and insert a new record
 @app.post("/tasks")
 def create_task(task: Task):
-    print(f"Richiesta POST /tasks ricevuta: {task.title}")
+    print(f"✅ Richiesta POST /tasks ricevuta: {task.title}")
     
     conn = get_db_connection()
-    cursor = conn.execute(
+    conn.execute(
         "INSERT INTO tasks (task_id, title, description, urgency, state, datetime) VALUES (?,?,?,?,?,?)",
         (task.id, task.title, task.description, task.urgency, task.state, task.datetime)
     )
@@ -107,3 +103,26 @@ def create_task(task: Task):
     conn.close()
     
     print(f"✅ Task creato con ID: {task.id}")
+
+    return {
+        "message": "Task creato con successo"}
+
+
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: str):
+    print(f"✅ Richiesta DELETE /tasks ricevuta: {task_id}")
+    
+    conn = get_db_connection()
+    cursor = conn.execute(
+        "DELETE FROM tasks WHERE task_id = ?", (task_id,))
+    conn.commit()
+    
+    if cursor.rowcount == 0:
+           conn.close()
+           raise HTTPException(status_code=404, detail="Task non trovato")
+    
+    conn.close()
+    
+    print(f"✅ Task {task_id} eliminato")
+
+    return {"message": "Task eliminato con successo"}

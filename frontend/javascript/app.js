@@ -12,6 +12,7 @@ const priority = {
 
 let cardCorrent = null;
 
+const API_URL = 'http://127.0.0.1:8000';
 let taskArray = [];
 
 
@@ -38,6 +39,8 @@ createTask(
     states.todo,
     "09:00 13/02"
 );
+
+
 
 createTask(
     "Elimina le task",
@@ -136,6 +139,7 @@ function createTask(title, desc, priority, uid, state, timestamp){
     deleteTask.addEventListener("click", (event)=>{
         event.stopPropagation();
         deleteTask.parentElement.parentElement.remove();
+        deleteTaskFromDb(uid);
     });
 
 
@@ -312,8 +316,7 @@ addTaskModalButton.addEventListener("click",()=>{
     
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
     
-
-
+    saveTask(taskArray[taskArray.length -1])
     closeModal();
 });
 
@@ -332,24 +335,48 @@ function addTaskToArray(title, desc, priority, uid, state, timestamp){
 }
 
 
-const API_URL = 'http://127.0.0.1:8000';
 
-//Fetch isa a function used fro making htttp requests to fetch resources
-function saveAllTask(){
+/*Try to sent the task dictionarity ad http post request, 
+  if not possibile trhow an error.*/
+async function saveTask(task){
+    try{
+        const response = await fetch(`${API_URL}/tasks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(task)
+        });
 
-    fetch(`${API_URL}/tasks`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(taskArray[0])
-    })
+        if(!response.ok){ throw new Error(`HTTP error! Status ${response.status}`)}
 
-    console.log(JSON.stringify(taskArray[0]))
+        const data = await response.json();
+        console.log('✅ Task Salvato:', data.message);
+        return data;
+    } 
+    catch(error){
+        console.error('Errore nel salvataggio del task:', error)
+        alert('Errore nel salvataggio del task. Riprova più tardi.');
+        return null;
+    }
 }
 
+async function deleteTaskFromDb(task_id){
+    try{
+        const response = await fetch(`${API_URL}/tasks/${task_id}`,{
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        })
 
-const tempBtn = document.querySelector(".audit")
-tempBtn.addEventListener("click",()=>{
-    saveAllTask();
-})
+        if(!response.ok){ throw new Error(`HTTP error! Status ${response.status}`)}
+
+        const data = await response.json();
+        console.log('✅ Task eliminato:', data.message);
+        return data;
+
+    }catch(error){
+        console.error('Errore nel eliminare il task:', error)
+        alert("Errore nell'eliminare il task Riprova più tardi.");
+        return null;
+    }
+}
