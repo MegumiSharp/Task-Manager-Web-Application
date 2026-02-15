@@ -178,10 +178,16 @@ function createTask(title, desc, priority, uid, state, timestamp){
             curretCardState.className = "state Done";
             curretCardState.textContent = "Done";
             card.className = 'task Done';
+
+            const index = taskArray.findIndex(t => t.uid === uid);
+            taskArray[index].state = "Done";
+            
+            editTask(uid, taskArray[index])
         }
     })
 
 }
+
 
 const overlay = document.querySelector('.overlay');
 
@@ -624,10 +630,6 @@ auditLogBtn.addEventListener("click", ()=>{
     auditLogTextArea.textContent = formatAuditLog();
     auditLogModal.showModal()
 });
-
-
-
-
 
 function formatAuditLog(){
 
