@@ -11,13 +11,12 @@ const priority = {
 }
 
 
-
+let walletBalance = 0;
 
 let currentCard = null;
 
 const API_URL = 'http://127.0.0.1:8000';
 let taskArray = [];
-
 loadAndDisplayTask();
 async function loadAndDisplayTask(){
     taskArray = await getAllTask();
@@ -27,6 +26,30 @@ async function loadAndDisplayTask(){
     })
 
     defaultArrayOrdering();
+}
+
+updateWalletBalance("", 0)
+
+function updateWalletBalance(operation, amount){
+    const walletText = document.querySelector(".wallet-amount");
+
+    if (operation === "add") {
+        walletText.classList.add("increase");
+        walletBalance += amount
+        setTimeout(()=>{ walletText.classList.remove("increase");},300)
+    
+    }
+    else if(operation === "remove") {
+        walletText.classList.add("decrease");
+        walletBalance -= amount
+        setTimeout(()=>{ walletText.classList.remove("decrease");},300)
+    } 
+    else {walletBalance = amount}
+
+    walletText.textContent = walletBalance;
+
+    
+
 }
 
 
@@ -114,6 +137,14 @@ function createTask(title, desc, priority, uid, state, timestamp){
 
     deleteTask.addEventListener("click", (event)=>{
         event.stopPropagation();
+
+        console.log(deleteTask.parentElement.textContent)
+
+        //Refund 1 token if state is not in done
+        if(deleteTask.parentElement.textContent.trim("") !== 'Done'){
+            updateWalletBalance("add", 1)
+        }
+
         deleteTask.parentElement.parentElement.remove();
         deleteTaskFromDb(uid);
     });
@@ -123,12 +154,16 @@ function createTask(title, desc, priority, uid, state, timestamp){
 
     checkMark.addEventListener("click", (e)=>{
 
-        const curretCardState = card.querySelector(".state")
         e.stopPropagation();
-        curretCardState.className = "state Done";
-        curretCardState.textContent = "Done";
-        card.className = 'task Done';
+        const curretCardState = card.querySelector(".state")
 
+        if (curretCardState.textContent !== "Done"){
+            updateWalletBalance("add", 2)
+                    
+            curretCardState.className = "state Done";
+            curretCardState.textContent = "Done";
+            card.className = 'task Done';
+        }
     })
 
 }
@@ -283,6 +318,13 @@ addNewTaskBtn.addEventListener("click", ()=> {
 
 addTaskModalButton.addEventListener("click",()=>{
 
+    if(walletBalance <= 0){
+        console.error('Wallet Balance insufficiente!')
+        alert('Wallet Balance insufficiente. \nContattare l\'amministratore.');
+        return
+    }
+
+    updateWalletBalance("remove", 1)
     
     const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title").value;
     const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description").value;
@@ -498,8 +540,8 @@ function searchQuery(query){
 }
 
 
-const eventTracker = [];
-let walletBalance = 100;
+let eventTracker = [];
+
 
 function createEvent(type, task_id, title, priority, state){
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);

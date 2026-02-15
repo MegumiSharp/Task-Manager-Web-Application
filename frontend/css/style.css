@@ -789,3 +789,19 @@ body.no-scroll{
     overflow: hidden;
 }
 
+
+.wallet-amount{
+    transition: transform 0.5s ease-in-out, color 0.5s ease-in-out;
+}
+
+.wallet-amount.increase{
+    transform: translateY(-4px) scale(1.4);
+    color: var(--green-color);
+}
+
+.wallet-amount.decrease{
+    transform: translateY(-4px) scale(1.4);
+    color: var(--red-color);
+}
+
+
