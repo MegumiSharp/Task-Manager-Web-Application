@@ -442,8 +442,8 @@ function defaultArrayOrdering(){
 
 }
 
-function cleanTaskBoard(){
-    const taskBoard = document.querySelector(".tasks-board")
+async function cleanTaskBoard(){
+    const taskBoard = document.querySelector(".tasks-board");
     taskBoard.innerHTML = '';
 }
 
@@ -456,4 +456,44 @@ function convertDate(dateTime){
     const year = new Date().getFullYear();
 
     return new Date(year,month-1, day, hours, minutes).getTime();
+}
+
+
+const searchBar = document.querySelector(".search-bar");
+let searchTimeout;
+
+searchBar.addEventListener("input", (e)=>{
+    const query = e.target.value.trim();
+
+    clearTimeout(searchTimeout);
+
+
+    searchTimeout = setTimeout(()=>{
+        if (query.length >=2){
+            searchQuery(query);
+        }else{
+            searchQuery("")
+        }
+
+    }, 600)
+    console.log(query)
+
+})
+
+function searchQuery(query){
+    const lowerQuery = query.toLowerCase();
+    
+    const filteredTasks = taskArray.filter(task =>{
+        return task.title.toLowerCase().includes(lowerQuery) ||
+        task.description.toLowerCase().includes(lowerQuery) ||
+        task.urgency.toLowerCase().includes(lowerQuery) ||
+        task.state.toLowerCase().includes(lowerQuery) ||
+        task.datetime.toLowerCase().includes(lowerQuery)
+    })
+    
+
+    cleanTaskBoard();
+    filteredTasks.forEach(task=>{
+        createTask(task.title, task.description, task.urgency, task.uid, task.state, task.datetime);
+    })
 }
