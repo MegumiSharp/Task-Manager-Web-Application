@@ -25,6 +25,8 @@ async function loadAndDisplayTask(){
     taskArray.forEach(element => {
         createTask(element.title, element.description, element.urgency, element.uid, element.state, element.datetime)
     })
+
+    defaultArrayOrdering();
 }
 
 
@@ -188,7 +190,6 @@ editModalButton.addEventListener("click", () => {
         
     editTask(taskId, taskArray[index]);
     
-
     closeModal();
 });
 
@@ -407,4 +408,52 @@ async function editTask(task_id, task){
         alert('Errore nell\'aggiornare il task. Riprova più tardi.');
         return null;
     }
+}
+
+
+/*By Default the Task are ordered by this group hierarchy To-Do > Doing > Done
+Every state group is ordered by priority High > Mid >Low.
+Lastly every task is ordered by newest first using timestamp*/
+function defaultArrayOrdering(){
+
+    const map = { 'High': 1, 'Mid': 2, 'Low': 3 }
+    const state = { 'To-Do': 1, 'Doing': 2, 'Done': 3 }
+
+    const temp  = taskArray;
+
+    temp.sort((a, b)=>{
+       
+        //Sort by state
+        const stateDiff = state[a.state.trim()] - state[b.state.trim()]
+        if(stateDiff !== 0) return stateDiff;
+        
+        //Sort by Priority
+        const urgencyDiff = map[a.urgency.trim()] - map[b.urgency.trim()]
+        if (urgencyDiff !== 0) return urgencyDiff;
+
+        //Sort by date
+        return convertDate(b.datetime) - convertDate(a.datetime) 
+    })
+
+    cleanTaskBoard();
+    taskArray.forEach(element => {
+        createTask(element.title, element.description, element.urgency, element.uid, element.state, element.datetime)
+    })
+
+}
+
+function cleanTaskBoard(){
+    const taskBoard = document.querySelector(".tasks-board")
+    taskBoard.innerHTML = '';
+}
+
+function convertDate(dateTime){
+    
+    const [time, date] = dateTime.split(" ");
+    const [hours, minutes] = time.split(":")
+    const [day, month] = date.split("/")
+
+    const year = new Date().getFullYear();
+
+    return new Date(year,month-1, day, hours, minutes).getTime();
 }
