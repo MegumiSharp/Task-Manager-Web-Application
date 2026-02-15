@@ -42,7 +42,7 @@ app.add_middleware(
 # What types of data are our task 
 
 class Task(BaseModel):
-        id: Optional[str] = None
+        uid: Optional[str] = None
         title: str
         description: str
         urgency: str
@@ -84,8 +84,8 @@ def root():
             "endpoints": {
                 "GET /tasks": "Get All tasks",
                 "POST /tasks": "Create Task in Database",
-                "PUT /tasks/{id}": "Update task in Database",
-                "DELETE /tasks/{id}": "Delete task in Database"    
+                "PUT /tasks/{uid}": "Update task in Database",
+                "DELETE /tasks/{uid}": "Delete task in Database"    
         }}
 
 
@@ -97,12 +97,12 @@ def create_task(task: Task):
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO tasks (task_id, title, description, urgency, state, datetime) VALUES (?,?,?,?,?,?)",
-        (task.id, task.title, task.description, task.urgency, task.state, task.datetime)
+        (task.uid, task.title, task.description, task.urgency, task.state, task.datetime)
     )
     conn.commit()
     conn.close()
     
-    print(f"✅ Task creato con ID: {task.id}")
+    print(f"✅ Task creato con ID: {task.uid}")
 
     return {
         "message": "Task creato con successo"}

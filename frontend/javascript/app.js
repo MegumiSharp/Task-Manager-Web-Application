@@ -10,7 +10,13 @@ const priority = {
     high : "High"
 }
 
+const credit = "✅ Credit";
+const debit = "❌ Debit";
+const refund = "💰 Refund"
 
+
+
+let walletTransactions = [];
 
 let walletBalance = 0;
 
@@ -33,6 +39,11 @@ updateWalletBalance("", 100)
 
 function updateWalletBalance(operation, amount){
     const walletText = document.querySelector(".wallet-amount");
+
+    if (operation === "remove" && walletBalance === 0){
+        alert("Balance cannot be negative")
+        return
+    }
 
     if (operation === "add") {
         walletText.classList.add("increase");
@@ -153,8 +164,6 @@ function createTask(title, desc, priority, uid, state, timestamp){
     deleteTask.addEventListener("click", (event)=>{
         event.stopPropagation();
 
-        console.log(deleteTask.parentElement.textContent)
-
         //Refund 1 token if state is not in done
         if(deleteTask.parentElement.textContent.trim("") !== 'Done'){
             updateWalletBalance("add", 1)
@@ -180,8 +189,10 @@ function createTask(title, desc, priority, uid, state, timestamp){
             card.className = 'task Done';
 
             const index = taskArray.findIndex(t => t.uid === uid);
+            console.log(taskArray[index])
             taskArray[index].state = "Done";
             
+            createTransaction(credit, uid, taskArray[index].title)
             editTask(uid, taskArray[index])
         }
     })
@@ -368,6 +379,7 @@ addTaskModalButton.addEventListener("click",()=>{
     const mm = String(date.getMonth() + 1).padStart(2,'0');
     const now = `${hh}:${min} ${dd}/${mm}`
 
+    console.log('hey')
     createTask(
         modalTitle,
         modalDesc,
@@ -376,6 +388,8 @@ addTaskModalButton.addEventListener("click",()=>{
         modalState,
         now,
     );
+
+
     
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
     createEvent("TASK_CREATED",uuid, modalTitle, modalPrioText , modalState)
@@ -390,12 +404,13 @@ function addTaskToArray(title, desc, priority, uid, state, timestamp){
         title: title,
         description: desc,
         urgency: priority,
-        id: uid,
+        uid: uid,
         state: state,
         datetime: timestamp
     };
-    
+    console.log('hey2')
     taskArray.push(task);
+    console.log(taskArray)
 }
 
 
@@ -543,7 +558,6 @@ searchBar.addEventListener("input", (e)=>{
         }
 
     }, 600)
-    console.log(query)
 })
 
 //Disable enter key to go to new line in search bar
@@ -595,7 +609,6 @@ function createEvent(type, task_id, title, priority, state){
         WALLET_CREDIT: 'WALLET_CREDIT'
     });
 
-    
     const event = {
         type: EventType[type],
         timestamp: now,
@@ -607,10 +620,46 @@ function createEvent(type, task_id, title, priority, state){
         }
     }
 
-    
     eventTracker.push(event)
-    console.log(eventTracker)
 }
+
+function createTransaction(type, task_id, title){
+    const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+    let amount = 0;
+
+    if(type === credit){amount = "+2"}
+    else if(type === debit){amount = "-1"}
+    else if(type === refund){amount = "+1"}
+
+    const transaction = {
+        type: type,
+        timestamp: now,
+        title: title,
+        uid: task_id,
+        balance: walletBalance,
+        amount: amount
+    }
+    walletTransactions.push(transaction); 
+}
+
+function formatTransactionLog(){
+    let formattedTransaction = ""
+    
+    walletTransactions.forEach(element=>{
+        formattedTransaction += `
+        ------------------------------------------------------------------
+        [ID TASK] = [${element.uid}]
+        [${element.timestamp}] | [${element.type}] 
+        Title: ${element.title}
+        Amound: [${element.amount}]
+        Balance After: [${element.balance}]
+        ------------------------------------------------------------------
+        `
+    })
+    return formattedTransaction
+}
+
+
 
 // Create a task, update a task, edit a task(ONLY TITLE, PRIORITY O STATE), DELETE A TASK, CREATE AN EVENT
 
@@ -627,7 +676,7 @@ auditLogBtn.addEventListener("click", ()=>{
 
     document.body.classList.add("no-scroll")
     overlay.classList.add("open");
-    auditLogTextArea.textContent = formatAuditLog();
+    auditLogTextArea.textContent = formatAuditLog(); //torna qui
     auditLogModal.showModal()
 });
 
