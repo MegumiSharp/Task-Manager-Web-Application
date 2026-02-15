@@ -226,6 +226,15 @@ header {
     }
 }
 
+@keyframes fadeInDone {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.5;
+    }
+}
+
 .task.To-Do:hover{
     border: 2px solid var(--todo-color);
 }
@@ -239,8 +248,9 @@ header {
 }
 
 .task.Done{
-    opacity: 0.5;
+    opacity: 0.5 ;
     filter: saturate(0.5);
+     animation: fadeInDone 0.5s ease forwards;
     
 }
 
