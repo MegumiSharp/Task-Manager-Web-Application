@@ -12,10 +12,6 @@ html {
     scroll-padding: 10rem;     /*pad for scrolling with contact us*/
 }
 
-::-webkit-scrollbar {
-    display: none;
-}
-
 /*Scrollbar Customization*/
 ::-webkit-scrollbar-track
 {

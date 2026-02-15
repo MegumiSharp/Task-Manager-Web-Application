@@ -143,17 +143,17 @@ const modalContent = editTaskDialog.querySelector('.modal-content');
 editTaskDialog.addEventListener("click", (event)=>{
     //The modal is behind the content, when clicked close the modal
     if(event.target === editTaskDialog){
-        closeModal();  
+        closeModal(editTaskDialog);  
     }
 });
 
 
-function closeModal(){
-    editTaskDialog.classList.add('closing');
+function closeModal(modal){
+    modal.classList.add('closing');
     setTimeout(()=>{
         overlay.classList.remove("open");
-        editTaskDialog.close();
-        editTaskDialog.classList.remove('closing');
+        modal.close();
+        modal.classList.remove('closing');
         
     },300);
 }
@@ -182,15 +182,15 @@ editModalButton.addEventListener("click", () => {
     // Aggiorna task nell'array e salva
     const taskId = currentCard.id;
     const index = taskArray.findIndex(t => t.uid === taskId);
-    console.log(taskArray[index])
     taskArray[index].title = modalTitle;
     taskArray[index].description = modalDesc;
     taskArray[index].urgency = modalPrioText;
     taskArray[index].state = modalStateText;
         
     editTask(taskId, taskArray[index]);
+    createEvent("TASK_UPDATED",taskArray[index].uid, modalTitle, modalPrioText , modalStateText)
     
-    closeModal();
+    closeModal(editTaskDialog);
 });
 
 // Funzione helper per aggiornare DOM
@@ -256,7 +256,7 @@ function toggleInactive(selector){
 
 const closeModalBtn = editTaskDialog.querySelector(".close-window");
 
-closeModalBtn.addEventListener("click", ()=>{closeModal();});
+closeModalBtn.addEventListener("click", ()=>{closeModal(editTaskDialog);});
 
 
 const addNewTaskBtn = document.querySelector('.add-new-task');
@@ -274,8 +274,6 @@ addNewTaskBtn.addEventListener("click", ()=> {
         modalTitle.value = "Title Task"
 
         modalDesc.value = "Describe your task here.."
-
-
 
         addTaskModalButton.setAttribute("style", "display: block");
         editModalButton.setAttribute("style", "display: none");
@@ -312,9 +310,10 @@ addTaskModalButton.addEventListener("click",()=>{
     );
     
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
-    
+    createEvent("TASK_CREATED",uuid, modalTitle, modalPrioText , modalState)
+
     saveTask(taskArray[taskArray.length -1])
-    closeModal();
+    closeModal(editTaskDialog);
 });
 
 
@@ -497,3 +496,82 @@ function searchQuery(query){
         createTask(task.title, task.description, task.urgency, task.uid, task.state, task.datetime);
     })
 }
+
+
+const eventTracker = [];
+let walletBalance = 100;
+
+function createEvent(type, task_id, title, priority, state){
+    const now = new Date().toISOString().replace("T", " ").slice(0, 19);
+
+    const EventType = Object.freeze({
+        TASK_CREATED: 'TASK_CREATED',
+        TASK_UPDATED: 'TASK_UPDATED',
+        TASK_DELETED: 'TASK_DELETED',
+        WALLET_DEBIT: 'WALLET_DEBIT',
+        WALLET_CREDIT: 'WALLET_CREDIT'
+    });
+
+    
+    const event = {
+        type: EventType[type],
+        timestamp: now,
+        payload: {
+            taskId: task_id,
+            title: title,
+            priority: priority,
+            state: state,
+        }
+    }
+
+    
+    eventTracker.push(event)
+    console.log(eventTracker)
+}
+
+// Create a task, update a task, edit a task(ONLY TITLE, PRIORITY O STATE), DELETE A TASK, CREATE AN EVENT
+
+
+// Do something --> CreateEvent --> Add event to array and save it on database
+//On startup database pull event tracker and write on array
+
+
+const auditLogModal = document.querySelector("#auditLog-modal")
+const auditLogBtn = document.querySelector(".button.audit")
+const auditLogTextArea = auditLogModal.querySelector(".audit-log-text-area")
+
+auditLogBtn.addEventListener("click", ()=>{
+
+    document.body.classList.add("no-scroll")
+    overlay.classList.add("open");
+    auditLogTextArea.textContent = formatAuditLog();
+    auditLogModal.showModal()
+});
+
+function formatAuditLog(){
+
+    let formattedEvents = ""
+
+    eventTracker.forEach(element=>{
+
+        if (element.type === ("TASK_CREATED" || "TASK_UPDATED" || "TASK_DELETED")){
+            formattedEvents += `
+            ----------------------------------------------------------------
+            [${element.timestamp}] - [${element.type}]
+                Task ID: ${element.payload.taskId}
+                Title: ${element.payload.title}
+                Priority: ${element.payload.priority}
+                State: ${element.payload.state}
+            ----------------------------------------------------------------`
+        }
+
+    })
+    return formattedEvents
+}
+
+auditLogModal.addEventListener("click", (event)=>{
+    //The modal is behind the content, when clicked close the modal
+    if(event.target === auditLogModal){
+        closeModal(auditLogModal)
+    }
+});
