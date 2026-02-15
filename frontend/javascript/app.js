@@ -11,6 +11,7 @@ const priority = {
 }
 
 
+
 let walletBalance = 0;
 
 let currentCard = null;
@@ -28,7 +29,7 @@ async function loadAndDisplayTask(){
     defaultArrayOrdering();
 }
 
-updateWalletBalance("", 0)
+updateWalletBalance("", 100)
 
 function updateWalletBalance(operation, amount){
     const walletText = document.querySelector(".wallet-amount");
@@ -48,8 +49,11 @@ function updateWalletBalance(operation, amount){
 
     walletText.textContent = walletBalance;
 
-    
-
+    if(walletBalance === 0){
+        document.querySelector(".button.add-new-task").disabled = true;
+    }else{
+        document.querySelector(".button.add-new-task").disabled = false;
+    }
 }
 
 
@@ -76,32 +80,42 @@ const addTaskModalButton = editTaskDialog.querySelector("#add-task-modal")
 function createTask(title, desc, priority, uid, state, timestamp){
     const taskBoard = document.querySelector(".tasks-board");
 
-    taskBoard.insertAdjacentHTML("beforeend",`
-         <div class="task ${state}" id="${uid}">
-            <div class="state-button-frame">
-                <div class="state ${state}">${state}</div>
-                <img  class="remove-icon" src="/frontend/resources/icons/remove.svg">
-            </div>
-            <div class="title-desc-frame">
-                <p class="task-title">${title}</p>
-                <p class="task-desc">${desc}</p>
-            </div>
-            <div class="priority-timestamp-frame">
-                <div class="priority ${priority}">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="7.66696" cy="7.66696" r="7.66696" fill="currentColor"/>
-                    </svg>
-                    <div>${priority}</div>
-                </div>
-                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-                    <title>Done</title>
-                    <g>
-                        <path fill="currentColor" d="M43.707,9.878c-.391-.391-1.024-.391-1.414,0l-25.293,25.293L5.707,23.878c-.391-.391-1.024-.391-1.414,0l-1.414,1.414c-.391,.391-.391,1.024,0,1.414l13.414,13.414c.391,.391,1.024,.391,1.414,0L45.122,12.707c.391-.391,.391-1.024,0-1.414l-1.414-1.414Z"></path>
-                    </g>
+    // Crea il container
+    const task = document.createElement('div');
+    task.className = `task ${state}`;
+    task.id = uid;
+
+    task.innerHTML = `
+         <div class="state-button-frame">
+            <div class="state ${state}">${state}</div>
+            <img class="remove-icon" src="/frontend/resources/icons/remove.svg">
+        </div>
+        <div class="title-desc-frame">
+            <p class="task-title"></p>
+            <p class="task-desc"></p>
+        </div>
+        <div class="priority-timestamp-frame">
+            <div class="priority ${priority}">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="7.66696" cy="7.66696" r="7.66696" fill="currentColor"/>
                 </svg>
-                <p class="timestamp">${timestamp}</p>
+                <div></div>
             </div>
-        </div>`);
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+                <title>Done</title>
+                <g>
+                    <path fill="currentColor" d="M43.707,9.878c-.391-.391-1.024-.391-1.414,0l-25.293,25.293L5.707,23.878c-.391-.391-1.024-.391-1.414,0l-1.414,1.414c-.391,.391-.391,1.024,0,1.414l13.414,13.414c.391,.391,1.024,.391,1.414,0L45.122,12.707c.391-.391,.391-1.024,0-1.414l-1.414-1.414Z"></path>
+                </g>
+            </svg>
+            <p class="timestamp"></p>
+        </div>`;
+
+    task.querySelector(".task-title").textContent = title;
+    task.querySelector(".task-desc").textContent = desc;
+    task.querySelector(".priority div").textContent = priority;
+    task.querySelector(".timestamp").textContent = timestamp;
+
+    taskBoard.appendChild(task);
 
     const card = document.getElementById(uid);
 
@@ -130,6 +144,7 @@ function createTask(title, desc, priority, uid, state, timestamp){
         
         addTaskModalButton.setAttribute("style", "display: none");
         editModalButton.setAttribute("style", "display: block");
+        
         editTaskDialog.showModal();
     });
 
@@ -183,6 +198,13 @@ editTaskDialog.addEventListener("click", (event)=>{
 });
 
 
+
+editTaskDialog.addEventListener("keydown",(event)=>{
+    if(event.key === 'Escape'){ 
+        event.preventDefault();
+        closeModal(editTaskDialog)}
+})
+
 function closeModal(modal){
     modal.classList.add('closing');
     setTimeout(()=>{
@@ -205,6 +227,7 @@ editModalButton.addEventListener("click", () => {
     const modalPrio = editTaskDialog.querySelector(".modpriority:not(.inactive)");
     const modalPrioText = modalPrio.textContent.replace("Priority", "").trim();
     const modalStateText = modalState.textContent;
+
 
     // Aggiorna DOM della card
     updateCardDOM(currentCard, {
@@ -306,23 +329,20 @@ addNewTaskBtn.addEventListener("click", ()=> {
         setActiveOption(modalStates, "To-Do");
         setActiveOption(modalPriority, "Low");
 
-        modalTitle.value = "Title Task"
-
-        modalDesc.value = "Describe your task here.."
+        //Reset the valu ein fiedl to let placeholder takes place
+        modalTitle.value = ""
+        modalDesc.value = ""
 
         addTaskModalButton.setAttribute("style", "display: block");
         editModalButton.setAttribute("style", "display: none");
+
+        //By deafault the title is empy so the add task is disabled
+        document.querySelector("#add-task-modal").disabled = true
         editTaskDialog.showModal();
 });
 
 
 addTaskModalButton.addEventListener("click",()=>{
-
-    if(walletBalance <= 0){
-        console.error('Wallet Balance insufficiente!')
-        alert('Wallet Balance insufficiente. \nContattare l\'amministratore.');
-        return
-    }
 
     updateWalletBalance("remove", 1)
     
@@ -518,8 +538,23 @@ searchBar.addEventListener("input", (e)=>{
 
     }, 600)
     console.log(query)
-
 })
+
+//Disable enter key to go to new line in search bar
+searchBar.addEventListener("keydown", (event)=>{
+    if(event.key === "Enter"){
+         event.preventDefault();
+    }
+})
+
+
+const modalEditTitle = document.querySelector(".edit-modal-text-area.title")
+modalEditTitle.addEventListener("keydown", (event)=>{
+    if(event.key === "Enter"){
+         event.preventDefault();
+    }
+})
+
 
 function searchQuery(query){
     const lowerQuery = query.toLowerCase();
@@ -590,6 +625,10 @@ auditLogBtn.addEventListener("click", ()=>{
     auditLogModal.showModal()
 });
 
+
+
+
+
 function formatAuditLog(){
 
     let formattedEvents = ""
@@ -617,3 +656,23 @@ auditLogModal.addEventListener("click", (event)=>{
         closeModal(auditLogModal)
     }
 });
+
+auditLogModal.addEventListener("keydown",(event)=>{
+    if(event.key === 'Escape'){ 
+        event.preventDefault();
+        closeModal(auditLogModal)}
+})
+
+const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
+
+modalTitle.addEventListener("input", (e)=>{
+    
+    const query = e.target.value.trim();
+    if(query === ""){
+        document.querySelector("#close-modal").disabled = true
+        document.querySelector("#add-task-modal").disabled = true
+    }else{
+        document.querySelector("#close-modal").disabled = false
+        document.querySelector("#add-task-modal").disabled = false
+    }
+})
