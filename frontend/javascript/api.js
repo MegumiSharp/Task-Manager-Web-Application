@@ -4,7 +4,8 @@
 // This module handles API request
 // ============================================================================
 
-const API_URL = 'http://127.0.0.1:8000';
+//const API_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = '/api';
 
 // ============================================================================
 // TASK DATABASE REQUEST
@@ -13,7 +14,7 @@ const API_URL = 'http://127.0.0.1:8000';
 //Save task data to the database
 export async function createTask(task){
     try{
-        const response = await fetch(`${API_URL}/tasks`, {
+        const response = await fetch(`${API_BASE_URL}/tasks`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -36,7 +37,7 @@ export async function createTask(task){
 
 export async function deleteTask(task_id){
     try{
-        const response = await fetch(`${API_URL}/tasks/${task_id}`,{
+        const response = await fetch(`${API_BASE_URL}/tasks/${task_id}`,{
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'}
         })
@@ -57,7 +58,7 @@ export async function deleteTask(task_id){
 
 export async function getTasks(){
     try {
-            const response = await fetch(`${API_URL}/tasks`);
+            const response = await fetch(`${API_BASE_URL}/tasks`);
             if (!response.ok) throw new Error('Errore nel recupero dei task');
             return await response.json();
         } catch (error) {
@@ -68,7 +69,7 @@ export async function getTasks(){
 
 export async function updateTask(task_id, task){
     try{
-        const response = await fetch(`${API_URL}/tasks/${task_id}`, {
+        const response = await fetch(`${API_BASE_URL}/tasks/${task_id}`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(task)
@@ -92,7 +93,7 @@ export async function updateTask(task_id, task){
 //Save task data to the database
 export async function createTransaction(transaction){
     try{
-        const response = await fetch(`${API_URL}/wallet`, {
+        const response = await fetch(`${API_BASE_URL}/wallet`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -116,7 +117,7 @@ export async function createTransaction(transaction){
 
 export async function getTransactions(){
     try {
-            const response = await fetch(`${API_URL}/wallet`);
+            const response = await fetch(`${API_BASE_URL}/wallet`);
             if (!response.ok) throw new Error('Errore nel recupero delle transactions');
             return await response.json();
         } catch (error) {
@@ -133,7 +134,7 @@ export async function getTransactions(){
 //Save event data to the database
 export async function createEventLog(event){
     try{
-        const response = await fetch(`${API_URL}/audit`, {
+        const response = await fetch(`${API_BASE_URL}/audit`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -157,7 +158,7 @@ export async function createEventLog(event){
 
 export async function getEvents(){
     try {
-            const response = await fetch(`${API_URL}/audit`);
+            const response = await fetch(`${API_BASE_URL}/audit`);
             if (!response.ok) throw new Error('Error retrieving events');
             return await response.json();
         } catch (error) {
