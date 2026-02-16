@@ -16,81 +16,95 @@
 </head>
 <body>
     <div class="content-wrapper">
-        <header>
-            <div><img class="logo" src="/frontend/resources/images/logo.png"></div>
-                <div class="balance-log-btns">
-                    <button class="button wallet"> <span class="wallet-amount">temp</span><img src="/frontend/resources/icons/money-bill-coin.svg"></button>
-                    <button class="button audit">Audit Log <img src="/frontend/resources/icons/database.svg"></button>
-                </div>
-                <div class="pfp-username">
-                    <div class="username">Simone</div>
-                    <img class="pfp" src="/frontend/resources/images/pfp_placeholder.png">
-                </div>
+        <header role="banner">
+            <div>
+                <img class="logo" src="/frontend/resources/images/logo.png" alt="Task Manager Logo">
+            </div>
+            <div class="balance-log-btns">
+                <button class="button wallet" aria-label="Wallet balance">
+                    <span class="wallet-amount">temp</span>
+                    <img src="/frontend/resources/icons/money-bill-coin.svg" alt="" aria-hidden="true">
+                </button>
+                <button class="button audit" aria-label="Open audit log">
+                    Audit Log 
+                    <img src="/frontend/resources/icons/database.svg" alt="" aria-hidden="true">
+                </button>
+            </div>
+            <div class="pfp-username">
+                <div class="username" aria-label="Current user">Simone</div>
+                <img class="pfp" src="/frontend/resources/images/pfp_placeholder.png" alt="User profile picture">
+            </div>
         </header>
 
-        <div class="main-section">
+        <main class="main-section" role="main">
             <div class="search-and-filter-section">
                 <div class="search-bar-container">                
-                    <img src="/frontend//resources/icons/search.svg">
-                    <textarea maxlength="55" rows="1"  placeholder="Search task..."class="search-bar"></textarea>
+                    <img src="/frontend/resources/icons/search.svg" alt="" aria-hidden="true">
+                    <label for="search-input" class="visually-hidden">Search tasks</label>
+                    <textarea id="search-input" maxlength="55" rows="1" placeholder="Search task..." class="search-bar" aria-label="Search for tasks"></textarea>
                 </div>
-                <button class="button add-new-task"> Add New Task <img src="/frontend/resources/icons/add-new-task.svg"></button>
+                <button class="button add-new-task" aria-label="Add new task">
+                    Add New Task 
+                    <img src="/frontend/resources/icons/add-new-task.svg" alt="" aria-hidden="true">
+                </button>
             </div>
-            <div class="tasks-board">
+            <div class="tasks-board" role="region" aria-label="Tasks board">
             </div>
-        </div>
+        </main>
     </div>
-    <div class="overlay"></div>
-    <dialog id="edit-modal">
+
+    <div class="overlay" aria-hidden="true"></div>
+
+    <dialog id="edit-modal" aria-labelledby="modal-title" aria-modal="true">
         <div class="modal-content">
+            <h2 id="modal-title" class="visually-hidden">Edit Task</h2>
             <div class="modal-top-frame">
                 <div class="modal-priority-state-frame">
-                    <div class="modal-state">
-                        <div class="state To-Do inactive" style="font-size: 16px;">To-Do</div>
-                        <div class="state Doing inactive"style="font-size: 16px;">Doing</div>
-                        <div class="state Done"style="font-size: 16px;">Done</div>
+                    <div class="modal-state" role="group" aria-label="Task status">
+                        <div class="state To-Do inactive" role="button" tabindex="0" aria-pressed="false" style="font-size: 16px;">To-Do</div>
+                        <div class="state Doing inactive" role="button" tabindex="0" aria-pressed="false" style="font-size: 16px;">Doing</div>
+                        <div class="state Done" role="button" tabindex="0" aria-pressed="true" style="font-size: 16px;">Done</div>
                     </div>
-                    <div class="modal-priority">
-                        <div class="modpriority Low inactive">Priority Low</div>
-                        <div class="modpriority Mid inactive">Priority Mid</div>
-                        <div class="modpriority High">Priority High</div>
+                    <div class="modal-priority" role="group" aria-label="Task priority">
+                        <div class="modpriority Low inactive" role="button" tabindex="0" aria-pressed="false">Priority Low</div>
+                        <div class="modpriority Mid inactive" role="button" tabindex="0" aria-pressed="false">Priority Mid</div>
+                        <div class="modpriority High" role="button" tabindex="0" aria-pressed="true">Priority High</div>
                     </div>
 
-                    <img  class="close-window" title="Close Window" alter="close button" src="/frontend/resources/icons/remove.svg">
+                    <img class="close-window" title="Close Window" aria-label="Close modal" src="/frontend/resources/icons/remove.svg" alt="" role="button" tabindex="0">
                 </div>
-                <hr style="border: 1.5px solid #DFD0B8; width: 108.9%; border-radius: 20px;">
-                </svg>
+                <hr style="border: 1.5px solid #DFD0B8; width: 108.9%; border-radius: 20px;" aria-hidden="true">
             </div>
+
             <div class="label-title-frame">
-                <div class="label-edit-title">
-                    <img src="/frontend/resources/icons/title_icon.svg">
+                <label for="task-title" class="label-edit-title">
+                    <img src="/frontend/resources/icons/title_icon.svg" alt="" aria-hidden="true">
                     Title
-                </div>
-                <textarea autofocus maxlength="60" rows="1" class="edit-modal-text-area title" placeholder="e.g Complete Q1 report..."></textarea>
+                </label>
+                <textarea id="task-title" autofocus maxlength="60" rows="1" class="edit-modal-text-area title" placeholder="e.g Complete Q1 report..." aria-required="true"></textarea>
             </div>
 
             <div class="label-title-frame">
-                <div class="label-edit-title">
-                    <img src="/frontend/resources/icons/description.svg">
+                <label for="task-description" class="label-edit-title">
+                    <img src="/frontend/resources/icons/description.svg" alt="" aria-hidden="true">
                     Description
-                </div>
-                <textarea maxlength="1300" rows="14" class="edit-modal-text-area description" placeholder="Add details, notes, or instructions for this task..."></textarea>
+                </label>
+                <textarea id="task-description" maxlength="1300" rows="14" class="edit-modal-text-area description" placeholder="Add details, notes, or instructions for this task..."></textarea>
             </div>
 
-
-            <button class="button" id="close-modal" aria-label="close modal">Apply Changes</button>
-            <button class="button" id="add-task-modal" aria-label="close modal">Add Task</button>
+            <button class="button" id="close-modal" aria-label="Apply changes and close modal">Apply Changes</button>
+            <button class="button" id="add-task-modal" aria-label="Add new task">Add Task</button>
         </div>
     </dialog>
     
-    <dialog id="auditLog-modal">
+    <dialog id="auditLog-modal" aria-labelledby="audit-log-title" aria-modal="true">
         <div class="audit-log-frame">
-            Audit Log
-            <textarea readonly class="audit-log-text-area"></textarea>
+            <h2 id="audit-log-title">Audit Log</h2>
+            <label for="audit-log-content" class="visually-hidden">Audit log entries</label>
+            <textarea id="audit-log-content" readonly class="audit-log-text-area" aria-label="Audit log entries - read only"></textarea>
         </div>
-        
-
     </dialog>
-    <script src="/frontend/javascript/app.js"></script>
+
+    <script type="module" src="/frontend/javascript/app.js"></script>
 </body>
 </html>
