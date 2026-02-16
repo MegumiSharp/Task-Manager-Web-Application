@@ -57,7 +57,13 @@ class Transaction(BaseModel):
         balance: int
         timestamp: str
 
-
+class Event(BaseModel):
+        taskId: Optional[str] = None
+        title: str
+        type: str
+        priority: str
+        state: str
+        timestamp: str
 
 # ═══════════════════════════════════════════════════════════
 # Database Functions
@@ -92,6 +98,17 @@ def create_db():
                 amount TEXT NOT NULL)
         ''')
 
+        connection.execute('''
+        CREATE TABLE IF NOT EXISTS events(
+                id_event INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL, 
+                timestamp TEXT NOT NULL,
+                title TEXT NOT NULL,
+                taskId TEXT NOT NULL,
+                priority TEXT NOT NULL,
+                state TEXT NOT NULL)
+        ''')
+
         connection.commit()
         connection.close()
         print("✅ Database inizializzato!")
@@ -108,7 +125,9 @@ def root():
                 "PUT /tasks/{uid}": "Update task in Database",
                 "DELETE /tasks/{uid}": "Delete task in Database",    
                 "POST /wallet" : "Create Wallet Transaction in Database",
-                "GET /wallet" : "Get All transactions"
+                "GET /wallet" : "Get All transactions",
+                "POST /audit" : "Create audit log in Database",
+                "GET /audit" : "Get All audit logs"
         }}
 
 
@@ -192,7 +211,6 @@ def edit_task(task_id: str, task: Task):
     return {"message": "Task modificato con successo"}
 
 
-
 # ═══════════════════════════════════════════════════════════
 # wALLET TRANSACTIONS DATABASE
 # ═══════════════════════════════════════════════════════════
@@ -234,3 +252,45 @@ def get_transactions():
 
         conn.close()
         return transaction
+
+# ═══════════════════════════════════════════════════════════
+# AUDIT LOG
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/audit")
+def create_event(event: Event):
+    print(f"✅ Richiesta POST /audit ricevuta: {event.title}")
+    
+    conn = get_db_connection()
+    conn.execute(
+            "INSERT INTO events (type, title, taskId, priority, timestamp, state) VALUES (?,?,?,?,?,?)",
+            (event.type, event.title, event.taskId, event.priority, event.timestamp, event.state)
+        )
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ Event added to db")
+
+    return {
+        "message": "Event added success"}
+
+
+@app.get("/audit")
+def get_audit_log():
+        conn = get_db_connection()
+        cursor = conn.execute("SELECT * FROM events ORDER BY taskId ASC")
+
+        events = []
+       
+        for record in cursor.fetchall():
+            events.append({
+                "type": record["type"],
+                "timestamp": record["timestamp"],
+                "taskId": record["taskId"],
+                "title": record["title"],
+                "priority": record["priority"],
+                "state": record["state"]
+            })
+
+        conn.close()
+        return events

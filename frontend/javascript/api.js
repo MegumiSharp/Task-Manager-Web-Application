@@ -86,13 +86,6 @@ export async function updateTask(task_id, task){
     }
 }
 
-
-// ============================================================================
-// AUDIT LOG DATABASE REQUEST
-// ============================================================================
-
-
-
 // ============================================================================
 // TRANSACTIONS AND BALANCE DATABASE REQUEST
 // ============================================================================
@@ -128,6 +121,47 @@ export async function getTransactions(){
             return await response.json();
         } catch (error) {
             console.error('Errore:', error);
+            return [];
+        }
+}
+
+
+// ============================================================================
+// AUDIT LOG DATABASE REQUEST
+// ============================================================================
+
+//Save event data to the database
+export async function createEventLog(event){
+    try{
+        const response = await fetch(`${API_URL}/audit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(event)
+        });
+
+        if(!response.ok){ throw new Error(`HTTP error! Status ${response.status}`)}
+
+        const data = await response.json();
+        console.log('✅ Event saved:', data.message);
+        return data;
+    } 
+    catch(error){
+        console.error('Error saving event:', error)
+        alert('Error saving event. Please try again later.');
+        return null;
+    }
+}
+
+
+export async function getEvents(){
+    try {
+            const response = await fetch(`${API_URL}/audit`);
+            if (!response.ok) throw new Error('Error retrieving events');
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
             return [];
         }
 }

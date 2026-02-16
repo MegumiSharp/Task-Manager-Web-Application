@@ -57,6 +57,12 @@ export function getLength(){
     return taskArray.length;
 }
 
+// Given a uid, delete that task in the array
+export function deleteTaskInArray(uid){
+    const index = getTaskByIndex(uid)
+    taskArray.splice(index, 1)
+}
+
 // ============================================================================
 // SORTING & RENDERING
 // ============================================================================

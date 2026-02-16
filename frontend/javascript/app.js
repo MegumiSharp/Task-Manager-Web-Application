@@ -1,8 +1,8 @@
-import { processTransaction, createEvent, setWalletTransactions } from "./headerModal.js";
-import { TRANSACTION_TYPES } from "./config.js";
+import { processTransaction, createEvent, setWalletTransactions,setAuditLog } from "./headerModal.js";
+import { TRANSACTION_TYPES, EVENTS_TYPES } from "./config.js";
 import { closeModal, openModalOverlay, getTimeTaskFormat } from "./utils.js";
 import { createTask, deleteTask, getTasks, updateTask } from "./api.js";
-import { setTaskArray, getTaskArray, findTaskInArray, getTaskByIndex, getLength, addTaskToArray} from "./taskArray.js";
+import { setTaskArray, getTaskArray, findTaskInArray, getTaskByIndex, getLength, addTaskToArray, deleteTaskInArray} from "./taskArray.js";
 import { renderTasks } from "./taskArray.js";
 
 const states = {
@@ -24,6 +24,7 @@ const priority = {
 
 
 setWalletTransactions();
+setAuditLog();
 
 
 let currentCard = null;
@@ -131,7 +132,7 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
         
         addTaskModalButton.setAttribute("style", "display: none");
         editModalButton.setAttribute("style", "display: block");
-        
+        checkStatusCard();
         editTaskDialog.showModal();
     });
 
@@ -140,12 +141,17 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
     deleteTaskBTN.addEventListener("click", (event)=>{
         event.stopPropagation();
 
+        
+        createEvent(EVENTS_TYPES.deleted, uid, title, priority , state)
+
         //Refund 1 token if state is not in done
         if(deleteTaskBTN.parentElement.textContent.trim("") !== 'Done'){
             processTransaction(TRANSACTION_TYPES.REFUND, uid, title)
+            createEvent(EVENTS_TYPES.wallet_credit, uid, title, priority , state)
         }
 
         deleteTaskBTN.parentElement.parentElement.remove();
+        deleteTaskInArray(uid);
         deleteTask(uid);
     });
 
@@ -167,6 +173,8 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
             
             processTransaction(TRANSACTION_TYPES.CREDIT, uid, findedTask.title)
             updateTask(uid, findedTask)
+
+            createEvent(EVENTS_TYPES.wallet_credit, uid, title, priority , state)
         }
     })
 
@@ -192,6 +200,7 @@ editTaskDialog.addEventListener("keydown",(event)=>{
 const editModalButton = editTaskDialog.querySelector('#close-modal');
 
 editModalButton.addEventListener("click", () => {
+    
     // Ottieni valori dal modal
     const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title").value;
     const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description").value;
@@ -209,16 +218,24 @@ editModalButton.addEventListener("click", () => {
         state: modalStateText
     });
     
-    // Aggiorna task nell'array e salva
+   
     const taskId = currentCard.id;
     const findedTask = findTaskInArray(taskId);
+
+    //If only the state or priority change, different event is written in log
+    if(findedTask.title === modalTitle && findedTask.description === modalDesc){
+        createEvent(EVENTS_TYPES.status_changed,findedTask.uid, modalTitle, modalPrioText , modalStateText)
+    }else{
+        createEvent(EVENTS_TYPES.updated,findedTask.uid, modalTitle, modalPrioText , modalStateText)
+    }
+    
+    // Aggiorna task nell'array e salva
     findedTask.title = modalTitle;
     findedTask.description = modalDesc;
     findedTask.urgency = modalPrioText;
     findedTask.state = modalStateText;
         
     updateTask(taskId, findedTask);
-    createEvent("TASK_UPDATED",findedTask.uid, modalTitle, modalPrioText , modalStateText)
     
     closeModal(editTaskDialog);
 });
@@ -305,6 +322,7 @@ addNewTaskBtn.addEventListener("click", ()=> {
 
         //By deafault the title is empy so the add task is disabled
         document.querySelector("#add-task-modal").disabled = true
+        checkStatusCard();
         editTaskDialog.showModal();
 });
 
@@ -331,7 +349,11 @@ addTaskModalButton.addEventListener("click",()=>{
     );
 
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
-    createEvent("TASK_CREATED",uuid, modalTitle, modalPrioText , modalState)
+    
+    //Create event for wallet debit and task created
+    createEvent(EVENTS_TYPES.created, uuid, modalTitle, modalPrioText , modalState)
+    createEvent(EVENTS_TYPES.wallet_debit, uuid, modalTitle, modalPrioText , modalState)
+
     processTransaction(TRANSACTION_TYPES.DEBIT, uuid, modalTitle)
 
     createTask(getTaskByIndex(getLength() -1))
@@ -361,3 +383,24 @@ modalTitle.addEventListener("input", (e)=>{
         document.querySelector("#add-task-modal").disabled = false
     }
 })
+
+
+function checkStatusCard(){
+    if (!currentCard) return;
+    
+    const currentCardState = currentCard.querySelector(".state");
+    const modalStateButtons = editTaskDialog.querySelectorAll(".modal-state .state");
+    
+    // If current card is already Done, disable all state buttons in modal
+    if (currentCardState && currentCardState.textContent.trim() === "Done") {
+        modalStateButtons.forEach(button => {
+            button.disabled = true;
+            button.style.cursor = "not-allowed";
+        });
+    } else {
+        modalStateButtons.forEach(button => {
+            button.disabled = false;
+            button.style.cursor = "pointer";
+        });
+    }
+}

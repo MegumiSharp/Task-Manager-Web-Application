@@ -8,7 +8,7 @@
 
 import { TRANSACTION_TYPES, TRANSACTION_AMOUNT, STARTER_BALANCE } from "./config.js";
 import { closeModal, openModalOverlay } from "./utils.js";
-import { createTransaction, getTransactions } from "./api.js";
+import { createTransaction, getTransactions, createEventLog, getEvents } from "./api.js";
 
 // ============================================================================
 // COMMON VARIABLES
@@ -21,6 +21,7 @@ const headerModalTitle = document.querySelector("#audit-log-title");
 // ============================================================================
 // AUDIT LOG VARIABLES
 // ============================================================================
+
 const auditLogBtn = document.querySelector(".button.audit");
 
 let eventTracker = [];
@@ -28,6 +29,7 @@ let eventTracker = [];
 // ============================================================================
 // TRANSACTION VARIABLES
 // ============================================================================
+
 const walletText = document.querySelector(".wallet-amount");
 const walletLogBtn = document.querySelector(".button.wallet");
 
@@ -37,55 +39,44 @@ let walletTransactions = [];
 let walletBalance = STARTER_BALANCE;
 updateWalletBalanceUI();
 
+
 // ============================================================================
 // AUDIT LOG EVENT FUNCTIONS 
 // ============================================================================
 
+export async function setAuditLog(){
+    eventTracker = await getEvents()
+}
+
 export function createEvent(type, task_id, title, priority, state){
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
-    const EventType = Object.freeze({
-        TASK_CREATED: 'TASK_CREATED',
-        TASK_UPDATED: 'TASK_UPDATED',
-        TASK_DELETED: 'TASK_DELETED',
-        WALLET_DEBIT: 'WALLET_DEBIT',
-        WALLET_CREDIT: 'WALLET_CREDIT'
-    });
-
     const event = {
-        type: EventType[type],
+        type: type,
         timestamp: now,
-        payload: {
-            taskId: task_id,
-            title: title,
-            priority: priority,
-            state: state,
-        }
+        taskId: task_id,
+        title: title,
+        priority: priority,
+        state: state,
     }
 
     eventTracker.push(event)
+    createEventLog(event)
 }
 
 function formatAuditLog() {
     let formattedEvents = "";
 
     eventTracker.forEach(element => {
-        // Filter for task-related events only
-        if (element.type === "TASK_CREATED" || 
-            element.type === "TASK_UPDATED" || 
-            element.type === "TASK_DELETED") {
-            
-            formattedEvents += `
+        formattedEvents += `
         ----------------------------------------------------------------
         [${element.timestamp}] - [${element.type}]
-            Task ID: ${element.payload.taskId}
-            Title: ${element.payload.title}
-            Priority: ${element.payload.priority}
-            State: ${element.payload.state}
+            Task ID: ${element.taskId}
+            Title: ${element.title}
+            Priority: ${element.priority}
+            State: ${element.state}
         ----------------------------------------------------------------`;
-        }
     });
-
     return formattedEvents;
 }
 
@@ -113,7 +104,6 @@ auditLogBtn.addEventListener("click", () => {
 
 export async function setWalletTransactions(){
     walletTransactions = await getTransactions()
-    console.log(walletTransactions)
     if(walletTransactions.length === 0){return} 
     
     walletBalance = walletTransactions[walletTransactions.length-1].balance;

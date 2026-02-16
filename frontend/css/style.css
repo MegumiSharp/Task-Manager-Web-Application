@@ -826,6 +826,7 @@ textarea::-webkit-scrollbar-thumb {
     transition: all 0.5s ease;
 }
 
+.state:disabled,
 #add-task-modal:disabled,
 #close-modal:disabled,
 .button.add-new-task:disabled{
@@ -845,3 +846,10 @@ textarea::-webkit-scrollbar-thumb {
     white-space: nowrap;
     border: 0;
 }
+
+button{
+    cursor: pointer;
+    outline: none;
+    border: none;
+}
+
