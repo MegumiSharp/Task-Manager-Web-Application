@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 import sqlite3
 import json
 
-DATABASE_NAME = "tasks.db"
+DATABASE_NAME = "app.db"
 
 FRONTEND_ORIGIN = "http://localhost:5500"
 
@@ -49,6 +49,15 @@ class Task(BaseModel):
         state: str
         datetime: str
 
+class Transaction(BaseModel):
+        uid: Optional[str] = None
+        title: str
+        type: str
+        amount: int
+        balance: int
+        timestamp: str
+
+
 
 # ═══════════════════════════════════════════════════════════
 # Database Functions
@@ -71,6 +80,18 @@ def create_db():
                 state TEXT NOT NULL,
                 datetime TEXT NOT NULL)
         ''')
+
+        connection.execute('''
+        CREATE TABLE IF NOT EXISTS wallet_transactions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL, 
+                title TEXT NOT NULL,
+                task_uid TEXT NOT NULL,
+                balance TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                amount TEXT NOT NULL)
+        ''')
+
         connection.commit()
         connection.close()
         print("✅ Database inizializzato!")
@@ -85,7 +106,9 @@ def root():
                 "GET /tasks": "Get All tasks",
                 "POST /tasks": "Create Task in Database",
                 "PUT /tasks/{uid}": "Update task in Database",
-                "DELETE /tasks/{uid}": "Delete task in Database"    
+                "DELETE /tasks/{uid}": "Delete task in Database",    
+                "POST /wallet" : "Create Wallet Transaction in Database",
+                "GET /wallet" : "Get All transactions"
         }}
 
 
@@ -167,3 +190,47 @@ def edit_task(task_id: str, task: Task):
     
     print(f"✅ Task {task_id} modificato")
     return {"message": "Task modificato con successo"}
+
+
+
+# ═══════════════════════════════════════════════════════════
+# wALLET TRANSACTIONS DATABASE
+# ═══════════════════════════════════════════════════════════
+
+@app.post("/wallet")
+def create_transaction(transaction: Transaction):
+    print(f"✅ Richiesta POST /wallet ricevuta: {transaction.title}")
+    
+    conn = get_db_connection()
+    conn.execute(
+            "INSERT INTO wallet_transactions (type, title, task_uid, balance, timestamp, amount) VALUES (?,?,?,?,?,?)",
+            (transaction.type, transaction.title, transaction.uid, transaction.balance, transaction.timestamp, transaction.amount)
+        )
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ Transaction added to db")
+
+    return {
+        "message": "Transactions added success"}
+
+
+@app.get("/wallet")
+def get_transactions():
+        conn = get_db_connection()
+        cursor = conn.execute("SELECT * FROM wallet_transactions ORDER BY id ASC")
+
+        transaction = []
+       
+        for record in cursor.fetchall():
+            transaction.append({
+                "type": record["type"],
+                "timestamp": record["timestamp"],
+                "title": record["title"],
+                "uid": record["task_uid"],
+                "balance": int(record["balance"]),
+                "amount": int(record["amount"])
+            })
+
+        conn.close()
+        return transaction

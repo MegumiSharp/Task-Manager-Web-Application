@@ -96,3 +96,38 @@ export async function updateTask(task_id, task){
 // ============================================================================
 // TRANSACTIONS AND BALANCE DATABASE REQUEST
 // ============================================================================
+//Save task data to the database
+export async function createTransaction(transaction){
+    try{
+        const response = await fetch(`${API_URL}/wallet`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(transaction)
+        });
+
+        if(!response.ok){ throw new Error(`HTTP error! Status ${response.status}`)}
+
+        const data = await response.json();
+        console.log('✅ Transaction salvata:', data.message);
+        return data;
+    } 
+    catch(error){
+        console.error('Errore nel salvataggio della transaction:', error)
+        alert('Errore nel salvataggio della transaction. Riprova più tardi.');
+        return null;
+    }
+}
+
+
+export async function getTransactions(){
+    try {
+            const response = await fetch(`${API_URL}/wallet`);
+            if (!response.ok) throw new Error('Errore nel recupero delle transactions');
+            return await response.json();
+        } catch (error) {
+            console.error('Errore:', error);
+            return [];
+        }
+}

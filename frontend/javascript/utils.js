@@ -61,7 +61,7 @@ export function convertDate(dateTime){
     return new Date(year, month - 1, day, hours, minutes).getTime();
 }
 
-
+//Get the time format for the task card
 export function getTimeTaskFormat(){
     const date = new Date(Date.now());
     const hh = String(date.getHours()).padStart(2,'0');

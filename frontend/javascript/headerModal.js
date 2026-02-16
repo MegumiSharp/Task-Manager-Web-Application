@@ -6,22 +6,36 @@
 // - Wallet/Balance: shows transaction history and current balance
 // ============================================================================
 
-import { TRANSACTION_TYPES } from "./config.js";
+import { TRANSACTION_TYPES, TRANSACTION_AMOUNT, STARTER_BALANCE } from "./config.js";
 import { closeModal, openModalOverlay } from "./utils.js";
-
+import { createTransaction, getTransactions } from "./api.js";
 
 // ============================================================================
-// AUDIT LOG AND TRANSACTION MODAL
+// COMMON VARIABLES
 // ============================================================================
 
-const auditLogModal = document.querySelector("#auditLog-modal");
+const headerModal = document.querySelector("#auditLog-modal");
+const headerModalTextArea = headerModal.querySelector(".audit-log-text-area");
+const headerModalTitle = document.querySelector("#audit-log-title");
+
+// ============================================================================
+// AUDIT LOG VARIABLES
+// ============================================================================
 const auditLogBtn = document.querySelector(".button.audit");
-const auditLogTextArea = auditLogModal.querySelector(".audit-log-text-area");
-
 
 let eventTracker = [];
+
+// ============================================================================
+// TRANSACTION VARIABLES
+// ============================================================================
+const walletText = document.querySelector(".wallet-amount");
+const walletLogBtn = document.querySelector(".button.wallet");
+
+let isAddTaskBtnDisabled =  document.querySelector(".button.add-new-task").disabled 
+
 let walletTransactions = [];
-let walletBalance = 0;
+let walletBalance = STARTER_BALANCE;
+updateWalletBalanceUI();
 
 // ============================================================================
 // AUDIT LOG EVENT FUNCTIONS 
@@ -81,44 +95,49 @@ function formatAuditLog() {
 // ============================================================================
 
 auditLogBtn.addEventListener("click", () => {
+    headerModalTitle.textContent = `Audit Log - ${eventTracker.length} Events`
     // Prevent body scroll and show overlay
     document.body.classList.add("no-scroll");
     openModalOverlay();
     
     // Populate audit log content
-    auditLogTextArea.textContent = formatAuditLog();
+    headerModalTextArea.textContent = formatAuditLog();
     
     // Display modal
-    auditLogModal.showModal();
-});
-
-// Close modal when clicking on backdrop
-auditLogModal.addEventListener("click", (event) => {
-    if (event.target === auditLogModal) {
-        closeModal(auditLogModal);
-    }
-});
-
-// Close modal when pressing Escape key (to better handle overlay)
-auditLogModal.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-        event.preventDefault();
-        closeModal(auditLogModal);
-    }
+    headerModal.showModal();
 });
 
 // ============================================================================
 // TRANSACTIONS FUNCTIONS
 // ============================================================================
 
-export function createTransaction(type, task_id, title){
+export async function setWalletTransactions(){
+    walletTransactions = await getTransactions()
+    console.log(walletTransactions)
+    if(walletTransactions.length === 0){return} 
+    
+    walletBalance = walletTransactions[walletTransactions.length-1].balance;
+    updateWalletBalanceUI();
+}
+
+function updateWalletBalanceUI(){
+    walletText.textContent = walletBalance;
+}
+
+export function processTransaction(type, uid, title){
+    let amount = 0; 
+    if(type === TRANSACTION_TYPES.CREDIT){amount = TRANSACTION_AMOUNT.CREDIT}
+    else if(type === TRANSACTION_TYPES.DEBIT){amount = TRANSACTION_AMOUNT.DEBIT}
+    else if(type === TRANSACTION_TYPES.REFUND){amount = TRANSACTION_AMOUNT.REFUND}
+
+    updateBalance(type, amount);
+    createTransactionData(type, uid, title, String(amount));
+}
+
+function createTransactionData(type, task_id, title, amount){
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);
-    let amount = 0;
-
-    if(type === TRANSACTION_TYPES.CREDIT){amount = "+2"}
-    else if(type === TRANSACTION_TYPES.DEBIT){amount = "-1"}
-    else if(type === TRANSACTION_TYPES.REFUND){amount = "+1"}
-
+    
+    
     const transaction = {
         type: type,
         timestamp: now,
@@ -127,53 +146,91 @@ export function createTransaction(type, task_id, title){
         balance: walletBalance,
         amount: amount
     }
+
     walletTransactions.push(transaction); 
+
+    //Create transaction in the database
+    createTransaction(transaction)
 }
 
 function formatTransactionLog(){
     let formattedTransaction = ""
+    let neg = ""
     
     walletTransactions.forEach(element=>{
+        if (element.type === TRANSACTION_TYPES.DEBIT) {neg = "-" } else {neg = "+"}
         formattedTransaction += `
         ------------------------------------------------------------------
         [ID TASK] = [${element.uid}]
         [${element.timestamp}] | [${element.type}] 
-        Title: ${element.title}
-        Amound: [${element.amount}]
-        Balance After: [${element.balance}]
+            Title: ${element.title}
+            Amount: [${neg}${element.amount}]
+            Balance: [${element.balance}]
         ------------------------------------------------------------------
         `
     })
     return formattedTransaction
 }
 
-
-export function updateWalletBalance(operation, amount){
-    const walletText = document.querySelector(".wallet-amount");
-
-    if (operation === "remove" && walletBalance === 0){
+function updateBalance(operation, amount){
+    if (operation === TRANSACTION_TYPES.DEBIT && walletBalance === 0){
         alert("Balance cannot be negative")
         return
     }
-
-    if (operation === "add") {
+    
+    if (operation === TRANSACTION_TYPES.CREDIT || operation === TRANSACTION_TYPES.REFUND) {
         walletText.classList.add("increase");
         walletBalance += amount
         setTimeout(()=>{ walletText.classList.remove("increase");},300)
-    
     }
-    else if(operation === "remove") {
+    else if(operation === TRANSACTION_TYPES.DEBIT) {
         walletText.classList.add("decrease");
         walletBalance -= amount
         setTimeout(()=>{ walletText.classList.remove("decrease");},300)
-    } 
-    else {walletBalance = amount}
-
-    walletText.textContent = walletBalance;
+    }
 
     if(walletBalance === 0){
-        document.querySelector(".button.add-new-task").disabled = true;
+        isAddTaskBtnDisabled = true;
     }else{
-        document.querySelector(".button.add-new-task").disabled = false;
+        isAddTaskBtnDisabled = false;
     }
+
+    updateWalletBalanceUI();
 }
+
+
+// ============================================================================
+// EVENT LISTENERS -  TRANSACTION BUTTON
+// ============================================================================
+
+walletLogBtn.addEventListener("click", () => {
+    headerModalTitle.textContent = `Transactions Log - Balance ${walletBalance} Tokens`;
+    // Prevent body scroll and show overlay
+    document.body.classList.add("no-scroll");
+    openModalOverlay();
+    
+    // Populate audit log content
+    headerModalTextArea.textContent = formatTransactionLog();
+    
+    // Display modal
+    headerModal.showModal();
+});
+
+// ============================================================================
+// DEFAULT MODAL BEHAVIOR
+// ============================================================================
+
+// Close modal when clicking on backdrop
+headerModal.addEventListener("click", (event) => {
+    if (event.target === headerModal) {
+        closeModal(headerModal);
+    }
+});
+
+// Close modal when pressing Escape key (to better handle overlay)
+headerModal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        event.preventDefault();
+        closeModal(headerModal);
+    }
+});

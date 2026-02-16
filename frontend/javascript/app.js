@@ -1,4 +1,4 @@
-import { createTransaction, updateWalletBalance, createEvent } from "./headerModal.js";
+import { processTransaction, createEvent, setWalletTransactions } from "./headerModal.js";
 import { TRANSACTION_TYPES } from "./config.js";
 import { closeModal, openModalOverlay, getTimeTaskFormat } from "./utils.js";
 import { createTask, deleteTask, getTasks, updateTask } from "./api.js";
@@ -18,6 +18,14 @@ const priority = {
 }
 
 
+
+
+
+
+
+setWalletTransactions();
+
+
 let currentCard = null;
 
 loadAndDisplayTask();
@@ -33,7 +41,7 @@ async function loadAndDisplayTask(){
     renderTasks();
 }
 
-updateWalletBalance("", 100)
+
 
 
 
@@ -134,7 +142,7 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
 
         //Refund 1 token if state is not in done
         if(deleteTaskBTN.parentElement.textContent.trim("") !== 'Done'){
-            updateWalletBalance("add", 1)
+            processTransaction(TRANSACTION_TYPES.REFUND, uid, title)
         }
 
         deleteTaskBTN.parentElement.parentElement.remove();
@@ -149,9 +157,7 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
         e.stopPropagation();
         const curretCardState = card.querySelector(".state")
 
-        if (curretCardState.textContent !== "Done"){
-            updateWalletBalance("add", 2)
-                    
+        if (curretCardState.textContent !== "Done"){                    
             curretCardState.className = "state Done";
             curretCardState.textContent = "Done";
             card.className = 'task Done';
@@ -159,7 +165,7 @@ export function createDOMTask(title, desc, priority, uid, state, timestamp){
             const findedTask = findTaskInArray(uid)
             findedTask.state = "Done";
             
-            createTransaction(TRANSACTION_TYPES.CREDIT, uid, findedTask.title)
+            processTransaction(TRANSACTION_TYPES.CREDIT, uid, findedTask.title)
             updateTask(uid, findedTask)
         }
     })
@@ -304,9 +310,6 @@ addNewTaskBtn.addEventListener("click", ()=> {
 
 
 addTaskModalButton.addEventListener("click",()=>{
-
-    updateWalletBalance("remove", 1)
-    
     const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title").value;
     const modalDesc = editTaskDialog.querySelector(".edit-modal-text-area.description").value;
     const uuid  = crypto.randomUUID();
@@ -329,6 +332,7 @@ addTaskModalButton.addEventListener("click",()=>{
 
     addTaskToArray(modalTitle, modalDesc, modalPrioText, uuid, modalState, now)
     createEvent("TASK_CREATED",uuid, modalTitle, modalPrioText , modalState)
+    processTransaction(TRANSACTION_TYPES.DEBIT, uuid, modalTitle)
 
     createTask(getTaskByIndex(getLength() -1))
     closeModal(editTaskDialog);
