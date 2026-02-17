@@ -1,45 +1,42 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware  #Makes the browser accept the request from the frontend
-from pydantic import BaseModel                      #Create a templete for data to improve verbose error handling
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from typing import List, Optional
 from contextlib import asynccontextmanager
 import sqlite3
-import json
+import os
 
 DATABASE_NAME = "app.db"
 
-FRONTEND_ORIGIN = "http://localhost:5500"
+# In Docker, requests come from nginx (same origin via proxy), so CORS isn't needed.
+ALLOWED_ORIGINS = [
+    "http://localhost:5500",    # Local dev (Live Server)
+    "http://127.0.0.1:5500",    # Local dev (Live Server alt)
+    "http://localhost",         # Docker
+    "http://localhost:8080",      # Docker explicit port
+]
 
-# Create the databse vefore the server start to accept request
 @asynccontextmanager
 async def server_lifespan(app: FastAPI):
-        print("Server FasAPI in avvio...")
+        print("Server FastAPI in avvio...")
         create_db()
         print("✅ Server Pronto")
         yield
-        #Aggiungere qui il salvataggio nel database
         print("Server in chiusura")
 
 app = FastAPI(lifespan=server_lifespan)
 
-# ═══════════════════════════════════════════════════════════
-# CONFIGURAZIONE CORS 
-# ═══════════════════════════════════════════════════════════
-
-# Makes the browser front end to not to block the request
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_ORIGIN],           #Alows request from this website
-    allow_credentials = True,               #To send cookies and autentication
-    allow_methods =["*"],                   #What methods http are ok (get,post, put,delete, patch, ecc)
-    allow_headers= ["*"]                    #What header can send request? content type autorization?
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 # ═══════════════════════════════════════════════════════════
 # Data Model
 # ═══════════════════════════════════════════════════════════
-
-# What types of data are our task 
 
 class Task(BaseModel):
         uid: Optional[str] = None
@@ -70,9 +67,8 @@ class Event(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 def get_db_connection():
-        #Create connection with databse, if not possible it create one
         connection = sqlite3.connect(DATABASE_NAME)
-        connection.row_factory = sqlite3.Row # Return result as dictionary
+        connection.row_factory = sqlite3.Row
         return connection
         
 def create_db():
@@ -131,11 +127,9 @@ def root():
         }}
 
 
-# When arrive an http request with route /tasks and post, opens the db and insert a new record
 @app.post("/tasks")
 def create_task(task: Task):
     print(f"✅ Richiesta POST /tasks ricevuta: {task.title}")
-    
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO tasks (task_id, title, description, urgency, state, datetime) VALUES (?,?,?,?,?,?)",
@@ -143,30 +137,21 @@ def create_task(task: Task):
     )
     conn.commit()
     conn.close()
-    
     print(f"✅ Task creato con ID: {task.uid}")
-
-    return {
-        "message": "Task creato con successo"}
+    return {"message": "Task creato con successo"}
 
 
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: str):
     print(f"✅ Richiesta DELETE /tasks ricevuta: {task_id}")
-    
     conn = get_db_connection()
-    cursor = conn.execute(
-        "DELETE FROM tasks WHERE task_id = ?", (task_id,))
+    cursor = conn.execute("DELETE FROM tasks WHERE task_id = ?", (task_id,))
     conn.commit()
-    
     if cursor.rowcount == 0:
            conn.close()
            raise HTTPException(status_code=404, detail="Task non trovato")
-    
     conn.close()
-    
     print(f"✅ Task {task_id} eliminato")
-
     return {"message": "Task eliminato con successo"}
 
 
@@ -174,9 +159,7 @@ def delete_task(task_id: str):
 def get_tasks():
         conn = get_db_connection()
         cursor = conn.execute("SELECT * FROM tasks ORDER BY datetime DESC")
-
         tasks = []
-       
         for record in cursor.fetchall():
             tasks.append({
                 "title": record["title"],
@@ -186,7 +169,6 @@ def get_tasks():
                 "state": record["state"],
                 "datetime": record["datetime"]
             })
-
         conn.close()
         return tasks
 
@@ -194,31 +176,26 @@ def get_tasks():
 @app.put("/tasks/{task_id}")
 def edit_task(task_id: str, task: Task):
     print(f"✅ Richiesta EDIT /tasks ricevuta: {task.title}")
-    
     conn = get_db_connection()
     cursor = conn.execute(
-        "UPDATE tasks SET title  = ?, description = ?, urgency = ?, state = ? WHERE task_id = ?", 
+        "UPDATE tasks SET title = ?, description = ?, urgency = ?, state = ? WHERE task_id = ?", 
         (task.title, task.description, task.urgency, task.state, task_id))
     conn.commit()
-    
     if cursor.rowcount == 0:
           conn.close()
           raise HTTPException(status_code=404, detail="Task non trovato")
-    
     conn.close()
-    
     print(f"✅ Task {task_id} modificato")
     return {"message": "Task modificato con successo"}
 
 
 # ═══════════════════════════════════════════════════════════
-# wALLET TRANSACTIONS DATABASE
+# WALLET TRANSACTIONS
 # ═══════════════════════════════════════════════════════════
 
 @app.post("/wallet")
 def create_transaction(transaction: Transaction):
     print(f"✅ Richiesta POST /wallet ricevuta: {transaction.title}")
-    
     conn = get_db_connection()
     conn.execute(
             "INSERT INTO wallet_transactions (type, title, task_uid, balance, timestamp, amount) VALUES (?,?,?,?,?,?)",
@@ -226,20 +203,15 @@ def create_transaction(transaction: Transaction):
         )
     conn.commit()
     conn.close()
-    
     print(f"✅ Transaction added to db")
-
-    return {
-        "message": "Transactions added success"}
+    return {"message": "Transactions added success"}
 
 
 @app.get("/wallet")
 def get_transactions():
         conn = get_db_connection()
         cursor = conn.execute("SELECT * FROM wallet_transactions ORDER BY id ASC")
-
         transaction = []
-       
         for record in cursor.fetchall():
             transaction.append({
                 "type": record["type"],
@@ -249,9 +221,9 @@ def get_transactions():
                 "balance": int(record["balance"]),
                 "amount": int(record["amount"])
             })
-
         conn.close()
         return transaction
+
 
 # ═══════════════════════════════════════════════════════════
 # AUDIT LOG
@@ -260,7 +232,6 @@ def get_transactions():
 @app.post("/audit")
 def create_event(event: Event):
     print(f"✅ Richiesta POST /audit ricevuta: {event.title}")
-    
     conn = get_db_connection()
     conn.execute(
             "INSERT INTO events (type, title, taskId, priority, timestamp, state) VALUES (?,?,?,?,?,?)",
@@ -268,20 +239,15 @@ def create_event(event: Event):
         )
     conn.commit()
     conn.close()
-    
     print(f"✅ Event added to db")
-
-    return {
-        "message": "Event added success"}
+    return {"message": "Event added success"}
 
 
 @app.get("/audit")
 def get_audit_log():
         conn = get_db_connection()
         cursor = conn.execute("SELECT * FROM events ORDER BY taskId ASC")
-
         events = []
-       
         for record in cursor.fetchall():
             events.append({
                 "type": record["type"],
@@ -291,6 +257,5 @@ def get_audit_log():
                 "priority": record["priority"],
                 "state": record["state"]
             })
-
         conn.close()
         return events

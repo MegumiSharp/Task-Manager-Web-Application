@@ -1,0 +1,20 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: taskmanager-backend
+    volumes:
+      - db-data:/app          # Persists the SQLite database between restarts
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: taskmanager-frontend
+    ports:
+      - "8080:80"               # App available at http://localhost
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db-data:

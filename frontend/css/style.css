@@ -55,7 +55,9 @@ body {
     color: var(--white-color);
     background: url(/frontend/resources/images/noise_texture.png);
     user-select: none;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .content-wrapper{

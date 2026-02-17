@@ -4,13 +4,15 @@
 // This module handles API request
 // ============================================================================
 
-const API_URL = 'http://127.0.0.1:8000';
-
+// Works automatically in both Docker (via nginx proxy) and local dev (Live Server)
+const API_URL = window.location.port === '5500'
+    ? 'http://127.0.0.1:8000'   // Local dev
+    : '/api';                    // Docker (any other port, including 8080)
+    
 // ============================================================================
 // TASK DATABASE REQUEST
 // ============================================================================
 
-//Save task data to the database
 export async function createTask(task){
     try{
         const response = await fetch(`${API_URL}/tasks`, {
@@ -89,7 +91,7 @@ export async function updateTask(task_id, task){
 // ============================================================================
 // TRANSACTIONS AND BALANCE DATABASE REQUEST
 // ============================================================================
-//Save task data to the database
+
 export async function createTransaction(transaction){
     try{
         const response = await fetch(`${API_URL}/wallet`, {
@@ -130,7 +132,6 @@ export async function getTransactions(){
 // AUDIT LOG DATABASE REQUEST
 // ============================================================================
 
-//Save event data to the database
 export async function createEventLog(event){
     try{
         const response = await fetch(`${API_URL}/audit`, {
