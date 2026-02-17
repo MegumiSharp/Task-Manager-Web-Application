@@ -223,6 +223,13 @@ editTaskDialog.addEventListener("keydown", (event) => {
 addNewTaskBtn.addEventListener("click", () => {
     openModalOverlay();
 
+    //Reset button in modal to be able to use them.
+    const modalStateButtons = editTaskDialog.querySelectorAll(".modal-state .state");
+    modalStateButtons.forEach(button =>{
+        button.disabled  = false;
+        button.style.cursor = "pointer"
+    })
+
     const modalTitle = editTaskDialog.querySelector(".edit-modal-text-area.title");
     const modalDesc  = editTaskDialog.querySelector(".edit-modal-text-area.description");
 
@@ -239,7 +246,7 @@ addNewTaskBtn.addEventListener("click", () => {
     // Title is empty so confirm button starts disabled
     document.querySelector("#add-task-modal").disabled = true;
 
-    checkStatusCard();
+
     editTaskDialog.showModal();
 });
 
@@ -346,10 +353,11 @@ function updateCardDOM(card, data) {
  * preventing state regression.
  */
 function checkStatusCard() {
-    if (!currentCard) return;
-
-    const isDone = currentCard.querySelector(".state")?.textContent.trim() === "Done";
+    if (!currentCard) {return};
+    
     const modalStateButtons = editTaskDialog.querySelectorAll(".modal-state .state");
+    const isDone = currentCard.querySelector(".state")?.textContent.trim() === "Done";
+
 
     modalStateButtons.forEach(button => {
         button.disabled    = isDone;

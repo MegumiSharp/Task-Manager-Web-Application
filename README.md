@@ -98,9 +98,9 @@ Your data is saved and will be there on the next start.
 
 **Reset everything (deletes the database)**
 ```bash
-docker compose down -v
+docker compose down -v --rmi all
 ```
-
+> ⚠️ This will delete all data stored in volumes (database, uploads, etc.) **of the project**. This action is irreversible.
 ---
 
 ## Local Development (Without Docker)
