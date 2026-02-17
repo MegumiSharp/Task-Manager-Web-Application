@@ -1,3 +1,7 @@
+
+![alt text](frontend/resources/images/readme_img.png "Logo Title Text 1")
+
+
 # Task Manager - Technical Test
 
 As requested for this technical test, I created a task manager within a one-week timeframe with the following features:
@@ -100,6 +104,7 @@ docker-compose up --build
 You can modify the initial balance and costs in `frontend/javascript/config.js`:
 ```javascript
 export const STARTER_BALANCE = 100;  // Initial balance
+const username = "TaskMaster" //Username
 export const TRANSACTION_AMOUNT = {
     CREDIT: 2,    // Credits for completing task
     DEBIT: 1,     // Cost to create task

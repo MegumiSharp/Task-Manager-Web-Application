@@ -22,3 +22,9 @@ export const EVENTS_TYPES = {
 
 //Wallet Balance at the start of the application
 export const STARTER_BALANCE = 100;
+
+const username = "TaskMaster"
+
+export function setUsername(){
+    document.querySelector(".username").textContent = username
+}
