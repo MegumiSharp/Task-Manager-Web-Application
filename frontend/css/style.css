@@ -316,7 +316,8 @@ header {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
-
+    text-overflow: ellipsis;
+    overflow: hidden;
     min-height: 100px;
 }
 
@@ -446,7 +447,7 @@ header {
     align-items: center;
     padding: 32px;
 
-    width: 819px;
+    min-width: 60vh;
 
 
     background: #393E46;
