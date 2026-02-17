@@ -5,15 +5,15 @@ from typing import List, Optional
 from contextlib import asynccontextmanager
 import sqlite3
 import json
-import os
 
-DATABASE_NAME = os.getenv("DATABASE_PATH", "/app/data/app.db")
+DATABASE_NAME = "app.db"
+
+FRONTEND_ORIGIN = "http://localhost:5500"
 
 # Create the databse vefore the server start to accept request
 @asynccontextmanager
 async def server_lifespan(app: FastAPI):
         print("Server FasAPI in avvio...")
-        os.makedirs(os.path.dirname(DATABASE_NAME), exist_ok=True)
         create_db()
         print("✅ Server Pronto")
         yield
@@ -29,7 +29,7 @@ app = FastAPI(lifespan=server_lifespan)
 # Makes the browser front end to not to block the request
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           #Alows request from this website
+    allow_origins=[FRONTEND_ORIGIN],           #Alows request from this website
     allow_credentials = True,               #To send cookies and autentication
     allow_methods =["*"],                   #What methods http are ok (get,post, put,delete, patch, ecc)
     allow_headers= ["*"]                    #What header can send request? content type autorization?
