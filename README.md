@@ -58,6 +58,7 @@ Task-Manager-Web-Application/
 
 > **Prerequisites:**
 > - [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+> - WSL (Windows subsystem for Linux
 > - [Git for Windows](https://git-scm.com)
 
 Open **PowerShell** and run:
